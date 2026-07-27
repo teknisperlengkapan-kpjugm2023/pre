@@ -213,6 +213,22 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
 .hidden{display:none}
 .info-txt{font-size:var(--fs-xs);color:var(--muted);margin-bottom:9px;line-height:1.55}
 
+.syncbar{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:var(--r);font-size:var(--fs-sm);font-weight:500;margin:0 1.15rem 1rem}
+.syncbar i{font-size:16px;flex-shrink:0}
+.syncbar-pending{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.syncbar-pending i{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.syncbar-ok{background:rgba(30,138,76,.18);color:#bdf0d1}
+.syncbar-fail{background:rgba(192,57,43,.2);color:#ffd0cb}
+.btn-pdf{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);font-weight:600;padding:12px 24px;border-radius:var(--r);cursor:pointer;font-size:var(--fs-base);display:none;align-items:center;gap:7px;min-height:var(--touch);margin:0 auto .85rem}
+.btn-pdf:hover{background:rgba(255,255,255,.2)}
+
+.photobox{background:var(--blue-xs);border:2px dashed var(--blue-md);border-radius:var(--rl);padding:1.3rem 1rem;text-align:center;margin-bottom:.9rem}
+.photobox i{font-size:28px;color:var(--blue-md);display:block;margin-bottom:.55rem}
+.photobox p{font-size:var(--fs-sm);color:var(--muted);margin-bottom:.85rem;line-height:1.5}
+.photo-preview{margin-bottom:.9rem;text-align:center}
+.photo-preview img{width:100%;max-width:100%;border-radius:var(--r);border:1px solid var(--brd);box-shadow:var(--sh-sm);margin-bottom:.6rem;display:block}
+
 .step-anim{animation:stepIn .35s cubic-bezier(.4,0,.2,1)}
 @keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
@@ -427,6 +443,17 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
 </div>
 <div class="card">
   <div class="ct"><span class="ctb"><i class="ti ti-rocket"></i></span>Takeoff</div>
+  <div class="stag"><i class="ti ti-camera"></i> Dokumentasi Foto Pra-Takeoff *</div>
+  <div class="photobox" id="photo_pre_empty">
+    <i class="ti ti-camera-plus"></i>
+    <p>Ambil foto kondisi drone sebelum takeoff. Label waktu real-time otomatis tertanam pada foto.</p>
+    <button class="btn btn-next" type="button" onclick="document.getElementById('photo_pre_input').click()">Ambil Foto</button>
+  </div>
+  <div class="photo-preview hidden" id="photo_pre_wrap">
+    <img id="photo_pre_prev" alt="Foto pra-takeoff">
+    <button class="btn btn-back" type="button" onclick="document.getElementById('photo_pre_input').click()"><i class="ti ti-refresh"></i> Ambil Ulang</button>
+  </div>
+  <input type="file" accept="image/*" capture="environment" id="photo_pre_input" onchange="handlePhoto('pre',this)" style="display:none">
   <div id="rdy_state">
     <div class="tozone">
       <div class="tzi"><i class="ti ti-rocket"></i></div>
@@ -506,6 +533,17 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
         <div class="fcol"><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_ltemp" step="0.1" placeholder="42.0" inputmode="decimal"><span class="unit">°C</span></div></div>
       </div>
     </div>
+    <div class="stag" style="margin-top:1rem"><i class="ti ti-camera"></i> Dokumentasi Foto Pasca-Landing *</div>
+    <div class="photobox" id="photo_land_empty">
+      <i class="ti ti-camera-plus"></i>
+      <p>Ambil foto kondisi drone setelah landing. Label waktu real-time otomatis tertanam pada foto.</p>
+      <button class="btn btn-next" type="button" onclick="document.getElementById('photo_land_input').click()">Ambil Foto</button>
+    </div>
+    <div class="photo-preview hidden" id="photo_land_wrap">
+      <img id="photo_land_prev" alt="Foto pasca-landing">
+      <button class="btn btn-back" type="button" onclick="document.getElementById('photo_land_input').click()"><i class="ti ti-refresh"></i> Ambil Ulang</button>
+    </div>
+    <input type="file" accept="image/*" capture="environment" id="photo_land_input" onchange="handlePhoto('land',this)" style="display:none">
     <div style="margin-top:.9rem">
       <label class="lbl" style="margin-bottom:6px">Kondisi Fisik Drone dan Kamera *</label>
       <div class="tpair">
@@ -584,8 +622,10 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
   <div class="confbody">
     <div class="csgrid" id="cs"></div>
   </div>
+  <div class="syncbar syncbar-pending" id="sync_status"><i class="ti ti-loader-2"></i> Menyinkronkan ke Google Sheets dan membuat PDF...</div>
   <div class="conffoot">
-    <div style="font-size:10.5px;color:rgba(255,255,255,.42);margin-bottom:10px">Data tersimpan di localStorage browser ini.</div>
+    <button class="btn-pdf" id="btn_pdf" onclick="downloadStoredPdf()"><i class="ti ti-file-type-pdf"></i> Unduh Ulang PDF Laporan</button>
+    <div style="font-size:10.5px;color:rgba(255,255,255,.42);margin-bottom:10px">Data juga tersimpan di localStorage browser ini sebagai cadangan.</div>
     <button class="btn-new" onclick="resetAll()"><i class="ti ti-plus"></i> Misi Baru</button>
   </div>
 </div>
@@ -594,7 +634,9 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
 </div>
 
 <script>
-var S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[]};
+var APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbzH5yZR3UErwKh6uscM7PpEgQfFgoGfljblVu1tXtmGK4zGGjE4hJwLhrAuIJUdlF4M/exec';
+var LAST_PDF={base64:'',name:''};
+var S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[],photoPre:null,photoLand:null};
 var TI=null;
 var STEPS=10;
 var DL={p4m:'Phantom 4 Multispectral',m3m:'Mavic 3 Multispectral',m350:'Matrice 350 RTK'};
@@ -667,7 +709,52 @@ function fmtT(d){return('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).sli
 function fmtD(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return('0'+h).slice(-2)+':'+('0'+m).slice(-2)+':'+('0'+sc).slice(-2);}
 function startTimer(){if(TI)clearInterval(TI);TI=setInterval(function(){if(!S.toTs)return;var str=fmtD(Math.floor((Date.now()-S.toTs)/1000));['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=str;});},1000);}
 function logEv(type){var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:type});var log=document.getElementById('evlog');if(log.innerHTML.indexOf('Belum')>-1)log.innerHTML='';log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>'+type+'</div>';}
-function validatePre(){var req=[{id:'f_weather',lbl:'Kondisi Cuaca'},{id:'f_wind',lbl:'Kecepatan Angin'},{id:'f_gps',lbl:'GPS Satelit'},{id:'f_bv',lbl:'Tegangan Baterai'},{id:'f_bl',lbl:'Level Baterai'}];for(var i=0;i<req.length;i++){if(!gv(req[i].id)){toast(req[i].lbl+' wajib diisi sebelum takeoff.');return false;}}if(!S.comp){toast('Kalibrasi Kompas wajib dipilih sebelum takeoff.');return false;}return true;}
+function stampPhoto(dataUrl,label,cb){
+  var img=new Image();
+  img.onload=function(){
+    var maxW=1600;
+    var scale=img.width>maxW?maxW/img.width:1;
+    var w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+    var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+    var ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    var now=new Date();
+    var ts=('0'+now.getDate()).slice(-2)+'/'+('0'+(now.getMonth()+1)).slice(-2)+'/'+now.getFullYear()+' '+fmtT(now)+' WIB';
+    var barH=Math.max(28,Math.round(h*0.055));
+    ctx.fillStyle='rgba(0,45,74,0.78)';
+    ctx.fillRect(0,h-barH,w,barH);
+    var fs=Math.max(12,Math.round(barH*0.42));
+    ctx.font='bold '+fs+'px monospace';
+    ctx.fillStyle='#fbd504';
+    ctx.textBaseline='middle';
+    ctx.fillText(label+'  \u2022  '+ts,10,h-barH/2);
+    cb(canvas.toDataURL('image/jpeg',0.82));
+  };
+  img.src=dataUrl;
+}
+function handlePhoto(kind,inputEl){
+  var file=inputEl.files&&inputEl.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var label=kind==='pre'?'FOTO PRA-TAKEOFF':'FOTO PASCA-LANDING';
+    stampPhoto(e.target.result,label,function(stamped){
+      if(kind==='pre'){
+        S.photoPre=stamped;
+        document.getElementById('photo_pre_prev').src=stamped;
+        document.getElementById('photo_pre_wrap').classList.remove('hidden');
+        document.getElementById('photo_pre_empty').classList.add('hidden');
+      }else{
+        S.photoLand=stamped;
+        document.getElementById('photo_land_prev').src=stamped;
+        document.getElementById('photo_land_wrap').classList.remove('hidden');
+        document.getElementById('photo_land_empty').classList.add('hidden');
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+  inputEl.value='';
+}
+function validatePre(){var req=[{id:'f_weather',lbl:'Kondisi Cuaca'},{id:'f_wind',lbl:'Kecepatan Angin'},{id:'f_gps',lbl:'GPS Satelit'},{id:'f_bv',lbl:'Tegangan Baterai'},{id:'f_bl',lbl:'Level Baterai'}];for(var i=0;i<req.length;i++){if(!gv(req[i].id)){toast(req[i].lbl+' wajib diisi sebelum takeoff.');return false;}}if(!S.comp){toast('Kalibrasi Kompas wajib dipilih sebelum takeoff.');return false;}if(!S.photoPre){toast('Ambil foto dokumentasi pra-takeoff terlebih dahulu.');return false;}return true;}
 function doTakeoff(){if(!validatePre())return;S.toTs=Date.now();var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:'TAKEOFF'});document.getElementById('to_disp').textContent=ts;document.getElementById('rdy_state').classList.add('hidden');document.getElementById('fly_state').classList.remove('hidden');startTimer();}
 function doLand(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}S.landTs=Date.now();var now=new Date();var ts=fmtT(now);S.dur=Math.floor((S.landTs-S.toTs)/1000);S.evs.push({t:ts,e:'LANDING'});document.getElementById('disp_to').textContent=fmtT(new Date(S.toTs));document.getElementById('disp_land').textContent=ts;document.getElementById('disp_dur').textContent=fmtD(S.dur);document.getElementById('pre_land').classList.add('hidden');document.getElementById('post_land').classList.remove('hidden');}
 function v1(){if(!gv('f_date')||!gv('f_loc')||!gv('f_mission')||!gv('f_pilot')){toast('Tanggal, Lokasi, Nama Misi, dan Pilot wajib diisi.');return;}if(!gv('f_alt')){toast('Flight Altitude wajib diisi.');return;}go(2);}
@@ -675,13 +762,13 @@ function v2(){if(!S.drone){toast('Pilih drone terlebih dahulu.');return;}buildCL
 function v3(){var r=cntCL('cl_drone');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_drone');if(S.drone==='m350')go(4);else go(6);}
 function v4(){if(!S.sensor){toast('Pilih sensor terlebih dahulu.');return;}go(5);}
 function v5(){var r=cntCL('cl_sensor');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_sensor');go(6);}
-function v8(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}if(!S.landTs){toast('Tekan LANDING SELESAI terlebih dahulu.');return;}if(!gv('f_lbatt')||!gv('f_lvolt')){toast('Data baterai landing wajib diisi.');return;}if(!S.phys){toast('Kondisi fisik drone wajib dipilih.');return;}go(9);}
+function v8(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}if(!S.landTs){toast('Tekan LANDING SELESAI terlebih dahulu.');return;}if(!gv('f_lbatt')||!gv('f_lvolt')){toast('Data baterai landing wajib diisi.');return;}if(!S.photoLand){toast('Ambil foto dokumentasi pasca-landing terlebih dahulu.');return;}if(!S.phys){toast('Kondisi fisik drone wajib dipilih.');return;}go(9);}
 function v9(){var r=cntCL('cl_post');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}go(10);}
 function b45(){go(4);}
 function b56(){if(S.drone==='m350')go(5);else go(3);}
 function doSubmit(){
   if(!S.oc){toast('Pilih hasil misi terlebih dahulu.');return;}
-  var d={misi:gv('f_mission'),tanggal:gv('f_date'),lokasi:gv('f_loc'),pilot:gv('f_pilot'),observer:gv('f_observer'),flightNo:gv('f_flightno'),battSet:gv('f_battset'),battLED:gv('f_battled'),x:gv('f_x'),y:gv('f_y'),z:gv('f_z'),altitude:gv('f_alt'),speed:gv('f_speed'),rth:gv('f_rth'),sideLap:gv('f_side'),overLap:gv('f_over'),margin:gv('f_margin'),drone:DL[S.drone]||'-',sensor:S.drone==='m350'?(SL[S.sensor]||'-'):'-',cuaca:gv('f_weather'),angin:gv('f_wind'),gps:gv('f_gps'),battVolt:gv('f_bv'),battLevel:gv('f_bl'),battTemp:gv('f_bt'),rcBatt:gv('f_rc'),takeoffSpd:gv('f_tos'),kompas:S.comp==='y'?'Selesai / OK':'Perlu Ulang',takeoffTime:S.toTs?fmtT(new Date(S.toTs)):'-',landingTime:S.landTs?fmtT(new Date(S.landTs)):'-',durasi:fmtD(S.dur),lBatt:gv('f_lbatt'),lVolt:gv('f_lvolt'),lTemp:gv('f_ltemp'),fisik:S.phys==='y'?'Aman / Normal':'Ada Kerusakan',fc:S.fc||'-',area:gv('f_area'),remarks:gv('f_remarks'),hasilMisi:S.oc,events:S.evs};
+  var d={misi:gv('f_mission'),tanggal:gv('f_date'),lokasi:gv('f_loc'),pilot:gv('f_pilot'),observer:gv('f_observer'),flightNo:gv('f_flightno'),battSet:gv('f_battset'),battLED:gv('f_battled'),x:gv('f_x'),y:gv('f_y'),z:gv('f_z'),altitude:gv('f_alt'),speed:gv('f_speed'),rth:gv('f_rth'),sideLap:gv('f_side'),overLap:gv('f_over'),margin:gv('f_margin'),drone:DL[S.drone]||'-',sensor:S.drone==='m350'?(SL[S.sensor]||'-'):'-',cuaca:gv('f_weather'),angin:gv('f_wind'),gps:gv('f_gps'),battVolt:gv('f_bv'),battLevel:gv('f_bl'),battTemp:gv('f_bt'),rcBatt:gv('f_rc'),takeoffSpd:gv('f_tos'),kompas:S.comp==='y'?'Selesai / OK':'Perlu Ulang',takeoffTime:S.toTs?fmtT(new Date(S.toTs)):'-',landingTime:S.landTs?fmtT(new Date(S.landTs)):'-',durasi:fmtD(S.dur),lBatt:gv('f_lbatt'),lVolt:gv('f_lvolt'),lTemp:gv('f_ltemp'),fisik:S.phys==='y'?'Aman / Normal':'Ada Kerusakan',fc:S.fc||'-',area:gv('f_area'),remarks:gv('f_remarks'),hasilMisi:S.oc,events:S.evs,photoPre:S.photoPre||'',photoLand:S.photoLand||''};
   try{var logs=[];try{var ex=localStorage.getItem('ugm_fl');if(ex)logs=JSON.parse(ex);}catch(e){}logs.push({id:Date.now(),data:d});localStorage.setItem('ugm_fl',JSON.stringify(logs));}catch(e){}
   var cs=document.getElementById('cs');
   var rows=[['Misi',d.misi],['Tanggal',d.tanggal],['Lokasi',d.lokasi],['Pilot',d.pilot],['Flight No.',d.flightNo||'-'],['Drone',d.drone],['Sensor',d.sensor],['Altitude',d.altitude?d.altitude+' m':'-'],['Cuaca',d.cuaca],['Angin',d.angin?d.angin+' m/s':'-'],['GPS',d.gps?d.gps+' sat':'-'],['Baterai Awal',d.battLevel?d.battLevel+'%':'-'],['Takeoff',d.takeoffTime],['Landing',d.landingTime],['DURASI','__TIMER__'],['Baterai Landing',d.lBatt?d.lBatt+'%':'-'],['Tegangan Landing',d.lVolt?d.lVolt+' V':'-'],['Kondisi Fisik',d.fisik],['Karakteristik',d.fc],['Hasil Misi',d.hasilMisi]];
@@ -690,10 +777,54 @@ function doSubmit(){
   cs.innerHTML=html;
   if(d.events&&d.events.length>0){var es=document.getElementById('evsum');es.innerHTML=d.events.map(function(e){return'<div class="eventry"><span class="evts">'+e.t+'</span>'+e.e+'</div>';}).join('');document.getElementById('evsum_wrap').classList.remove('hidden');}
   go(11);
+  syncToCloud(d);
+}
+function syncToCloud(d){
+  var el=document.getElementById('sync_status');
+  var btn=document.getElementById('btn_pdf');
+  btn.style.display='none';
+  el.className='syncbar syncbar-pending';
+  el.innerHTML='<i class="ti ti-loader-2"></i> Menyinkronkan ke Google Sheets dan membuat PDF...';
+  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL.indexOf('PASTE_URL')===0){
+    el.className='syncbar syncbar-fail';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Backend belum disambungkan (APPS_SCRIPT_URL belum diisi). Data tetap aman di perangkat ini.';
+    return;
+  }
+  fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)})
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.success){
+        LAST_PDF.base64=res.pdfBase64;LAST_PDF.name=res.fileName||'Laporan-Penerbangan.pdf';
+        el.className='syncbar syncbar-ok';
+        el.innerHTML='<i class="ti ti-circle-check"></i> Tersimpan di Google Sheets. PDF laporan sedang diunduh.';
+        btn.style.display='inline-flex';
+        downloadStoredPdf();
+      }else{
+        el.className='syncbar syncbar-fail';
+        el.innerHTML='<i class="ti ti-alert-triangle"></i> Gagal sinkron: '+(res.error||'tidak diketahui')+'. Data tetap aman di perangkat ini.';
+      }
+    })
+    .catch(function(){
+      el.className='syncbar syncbar-fail';
+      el.innerHTML='<i class="ti ti-alert-triangle"></i> Tidak bisa terhubung ke server. Data tetap tersimpan di perangkat ini.';
+    });
+}
+function downloadStoredPdf(){
+  if(!LAST_PDF.base64){toast('PDF belum tersedia.');return;}
+  var byteChars=atob(LAST_PDF.base64);
+  var byteNumbers=new Array(byteChars.length);
+  for(var i=0;i<byteChars.length;i++){byteNumbers[i]=byteChars.charCodeAt(i);}
+  var byteArray=new Uint8Array(byteNumbers);
+  var blob=new Blob([byteArray],{type:'application/pdf'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=LAST_PDF.name;document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},4000);
 }
 function resetAll(){
   if(TI)clearInterval(TI);TI=null;
-  S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[]};
+  S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[],photoPre:null,photoLand:null};
   document.querySelectorAll('input:not([type=checkbox]),select,textarea').forEach(function(e){e.value='';});
   document.querySelectorAll('input[type=checkbox]').forEach(function(e){e.checked=false;});
   document.querySelectorAll('.cli').forEach(function(e){e.classList.remove('checked','locked');e.onclick=function(){clT(this);};e.querySelector('input')&&(e.querySelector('input').disabled=false);});
@@ -710,6 +841,14 @@ function resetAll(){
   ['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='00:00:00';});
   document.getElementById('evlog').innerHTML='<span style="color:var(--muted)">Belum ada kejadian dicatat.</span>';
   document.getElementById('evsum_wrap').classList.add('hidden');
+  document.getElementById('photo_pre_wrap').classList.add('hidden');
+  document.getElementById('photo_pre_empty').classList.remove('hidden');
+  document.getElementById('photo_pre_input').value='';
+  document.getElementById('photo_land_wrap').classList.add('hidden');
+  document.getElementById('photo_land_empty').classList.remove('hidden');
+  document.getElementById('photo_land_input').value='';
+  document.getElementById('btn_pdf').style.display='none';
+  LAST_PDF={base64:'',name:''};
   go(1);
 }
 buildDots();updateBar();
