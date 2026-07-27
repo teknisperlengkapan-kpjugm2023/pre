@@ -1,0 +1,706 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#00416b;--blue-dk:#002d4a;--blue-md:#1a6fa0;--blue-lt:#deeef8;--blue-xs:#f0f7fc;
+  --yellow:#fbd504;--yellow-dk:#e6c200;--yellow-lt:#fffbe6;
+  --ok:#1e8a4c;--ok-bg:#e8f7ee;--ok-bd:#a8dfc0;
+  --warn:#b5690a;--warn-bg:#fff3e0;--warn-bd:#f3c98a;
+  --danger:#c0392b;--danger-bg:#fceceb;--danger-bd:#f0b4ac;
+  --green:#27ae60;--green-dk:#219a52;--red:#e74c3c;--red-dk:#c0392b;
+  --text:var(--color-text-primary);--muted:var(--color-text-secondary);
+  --card:var(--color-background-primary);--surf:var(--color-background-secondary);
+  --brd:var(--color-border-tertiary);--brd2:var(--color-border-secondary);
+  --r:10px;--rl:14px;--touch:48px;
+  --fs-xs:11px;--fs-sm:12px;--fs-base:14px;--fs-md:15px;--fs-lg:17px;
+  --sh-xs:0 1px 2px rgba(0,65,107,.07);
+  --sh-sm:0 2px 8px rgba(0,65,107,.09);
+  --sh-md:0 6px 20px rgba(0,65,107,.14),0 1px 3px rgba(0,65,107,.08);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);background:transparent;font-size:var(--fs-base)}
+.shell{max-width:720px;margin:0 auto;padding:0 4px 3rem}
+
+/* ---------- Topbar ---------- */
+.topbar{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dk) 100%);border-radius:var(--rl);margin-bottom:1.1rem;overflow:hidden;box-shadow:var(--sh-md);position:relative}
+.topbar::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:15px 15px;pointer-events:none}
+.topbar-stripe{height:4px;background:linear-gradient(90deg,var(--yellow-dk),var(--yellow) 40%,var(--yellow) 60%,var(--yellow-dk));position:relative;z-index:1}
+.topbar-inner{padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;position:relative;z-index:1}
+.tlogo{width:44px;height:44px;min-width:44px;background:linear-gradient(155deg,var(--yellow),var(--yellow-dk));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.45)}
+.tlogo i{font-size:21px;color:var(--blue-dk)}
+.ttext h1{font-size:var(--fs-base);font-weight:600;color:#fff;line-height:1.25;letter-spacing:.01em}
+.ttext p{font-size:var(--fs-xs);color:rgba(255,255,255,.62);margin-top:2px;line-height:1.3}
+.tbadge{margin-left:auto;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:rgba(255,255,255,.88);white-space:nowrap;flex-shrink:0;letter-spacing:.03em}
+
+/* ---------- Progress ---------- */
+.prog-wrap{margin-bottom:1.1rem}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-xs);color:var(--muted);margin-bottom:6px}
+.prog-meta b{color:var(--blue);font-weight:600}
+#prog_pct{background:var(--yellow);color:var(--blue-dk);font-weight:700;font-size:10.5px;padding:2px 9px;border-radius:20px;letter-spacing:.02em}
+.prog-bar{height:7px;background:var(--surf);border-radius:6px;overflow:hidden;border:.5px solid var(--brd);position:relative}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-md),var(--blue));border-radius:6px;transition:width .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.prog-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2.2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.prog-dots{display:flex;gap:3px;margin-top:5px}
+.pdot{flex:1;height:3px;border-radius:2px;background:var(--brd);transition:background .3s}
+.pdot.done{background:var(--blue-md)}
+.pdot.cur{background:var(--yellow)}
+
+/* ---------- Step bar ---------- */
+.step-bar{display:flex;gap:4px;margin-bottom:1.1rem;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.step-bar::-webkit-scrollbar{display:none}
+.sp{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:20px;font-size:10.5px;font-weight:500;white-space:nowrap;border:1px solid var(--brd);background:var(--card);color:var(--muted);transition:all .25s cubic-bezier(.4,0,.2,1);min-height:31px}
+.sp i{font-size:12px}
+.sp.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(0,65,107,.28);transform:translateY(-1px)}
+.sp.done{background:var(--blue-lt);border-color:#00416b33;color:var(--blue-md)}
+.sp.done::after{content:'✓';margin-left:1px;font-size:10px;color:var(--blue-md);font-weight:700}
+
+/* ---------- Toast ---------- */
+.vtoast{background:linear-gradient(135deg,var(--danger),var(--red-dk));color:#fff;border-radius:var(--r);padding:11px 14px;font-size:var(--fs-sm);margin-bottom:.75rem;display:none;align-items:center;gap:9px;position:sticky;top:4px;z-index:100;box-shadow:0 6px 18px rgba(192,57,43,.35);animation:toastIn .25s ease}
+@keyframes toastIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.vtoast i{font-size:17px;flex-shrink:0}
+
+/* ---------- Card ---------- */
+.card{background:var(--card);border:.5px solid var(--brd);border-radius:var(--rl);padding:1.1rem;margin-bottom:.85rem;position:relative;overflow:hidden;box-shadow:var(--sh-sm)}
+.card::before{content:'';position:absolute;top:0;left:1rem;right:1rem;height:3px;background:linear-gradient(90deg,var(--yellow-dk),var(--yellow) 50%,var(--yellow-dk));border-radius:0 0 3px 3px}
+.ct{font-size:var(--fs-xs);font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:.5px solid var(--brd);margin-bottom:.9rem}
+.ctb{width:26px;height:26px;min-width:26px;border-radius:8px;background:var(--blue-xs);display:flex;align-items:center;justify-content:center;color:var(--blue)}
+.ctb i{font-size:14px}
+.stag{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--blue-md),var(--blue));color:#fff;font-size:9.5px;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:.05em;box-shadow:var(--sh-xs)}
+
+.fg{display:grid;gap:9px 12px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+.fg-1{grid-template-columns:1fr}
+.fcol{grid-column:1/-1}
+
+label.lbl{display:block;font-size:var(--fs-xs);color:var(--muted);margin-bottom:4px;font-weight:600;letter-spacing:.01em}
+.uw{position:relative;display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--brd2);border-radius:var(--r);padding:0 12px;min-height:var(--touch);transition:border-color .2s,background .2s,box-shadow .2s}
+.uw:focus-within{border-color:var(--blue-md);background:var(--card);box-shadow:0 0 0 3.5px #00416b1a}
+.uw input{flex:1;min-width:0;border:none!important;background:transparent!important;padding:12px 0!important;min-height:unset!important;text-align:right;font-weight:700;box-shadow:none!important}
+.uw input:focus{box-shadow:none!important;border:none!important;background:transparent!important}
+.unit{font-size:9.5px;font-weight:700;color:var(--blue);pointer-events:none;background:var(--blue-xs);padding:3px 7px;border-radius:6px;letter-spacing:.04em;flex-shrink:0;transition:background .2s,color .2s}
+.uw:focus-within .unit{background:var(--blue);color:#fff}
+
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--brd2);border-radius:var(--r);font-size:var(--fs-base);color:var(--text);background:var(--surf);outline:none;font-family:inherit;transition:all .15s;-webkit-appearance:none;min-height:var(--touch)}
+input:focus,select:focus,textarea:focus{border-color:var(--blue-md);background:var(--card);box-shadow:0 0 0 3.5px #00416b1a}
+textarea{resize:vertical;min-height:72px}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:21px;height:21px;min-height:unset;border:1.5px solid var(--brd2);border-radius:6px;background:var(--card);cursor:pointer;flex-shrink:0;position:relative;transition:all .15s}
+input[type=checkbox]:checked{background:var(--blue);border-color:var(--blue)}
+input[type=checkbox]:checked::after{content:'';position:absolute;left:6.5px;top:3px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+input[type=checkbox]:disabled{opacity:.55;cursor:default}
+
+/* ---------- Drone / sensor pick ---------- */
+.drone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.drone-card{border:1.5px solid var(--brd);border-radius:var(--rl);padding:.9rem .6rem;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);background:var(--surf);text-align:center;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;box-shadow:var(--sh-xs)}
+.drone-card:hover{border-color:var(--blue-md);transform:translateY(-1px)}
+.drone-card.sel{border-color:var(--blue);background:var(--blue-lt);box-shadow:var(--sh-sm)}
+.drone-card.sel::after{content:'\2713';position:absolute;top:7px;right:8px;width:17px;height:17px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.dico{width:38px;height:38px;min-width:38px;border-radius:11px;background:var(--blue-xs);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:19px;transition:all .2s}
+.drone-card.sel .dico{background:var(--blue);color:#fff}
+.drone-card span:not(.dico){font-size:var(--fs-xs);font-weight:500;color:var(--text);line-height:1.35}
+
+.sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sensor-card{border:1.5px solid var(--brd);border-radius:var(--rl);padding:.8rem .9rem;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);background:var(--surf);display:flex;align-items:center;gap:11px;min-height:58px;position:relative;box-shadow:var(--sh-xs)}
+.sensor-card:hover{border-color:var(--blue-md);transform:translateY(-1px)}
+.sensor-card.sel{border-color:var(--blue);background:var(--blue-lt);box-shadow:var(--sh-sm)}
+.sensor-card.sel::after{content:'\2713';position:absolute;top:7px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.sico{width:34px;height:34px;min-width:34px;border-radius:10px;background:var(--blue-xs);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:17px;transition:all .2s}
+.sensor-card.sel .sico{background:var(--blue);color:#fff}
+.sensor-card span:not(.sico){font-size:var(--fs-sm);font-weight:500;color:var(--text)}
+
+/* ---------- Checklists ---------- */
+.cl-grid{display:grid;gap:6px}
+.cl-2{grid-template-columns:1fr 1fr}
+.cl-1{grid-template-columns:1fr}
+.cli{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);cursor:pointer;transition:all .15s;min-height:44px}
+.cli:hover{border-color:var(--blue-md)}
+.cli label{font-size:var(--fs-sm);line-height:1.4;cursor:pointer;color:var(--text);padding-top:2px}
+.cli.checked{background:var(--blue-lt);border-color:#00416b3a}
+.cli.checked label{color:var(--blue-dk)}
+.cli.locked{opacity:.55;pointer-events:none}
+
+/* ---------- Toggle groups ---------- */
+.tpair{display:flex;gap:7px}
+.tog{flex:1;padding:10px;border:1px solid var(--brd2);border-radius:var(--r);font-size:var(--fs-sm);font-weight:500;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf);color:var(--muted);min-height:var(--touch);display:flex;align-items:center;justify-content:center;gap:6px}
+.tog:hover{border-color:var(--blue-md)}
+.tog.yes-on{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok);font-weight:600}
+.tog.no-on{background:var(--danger-bg);border-color:var(--danger-bd);color:var(--danger);font-weight:600}
+
+.fcrow{display:flex;gap:7px}
+.fcb{flex:1;padding:10px 6px;border:1px solid var(--brd2);border-radius:var(--r);text-align:center;cursor:pointer;font-size:var(--fs-sm);font-weight:500;background:var(--surf);color:var(--muted);transition:all .15s;min-height:var(--touch);display:flex;align-items:center;justify-content:center;gap:5px}
+.fcb:hover{border-color:var(--blue-md)}
+.fcb.fn.on{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok);font-weight:600}
+.fcb.fw.on{background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn);font-weight:600}
+.fcb.fu.on{background:var(--danger-bg);border-color:var(--danger-bd);color:var(--danger);font-weight:600}
+
+.oc-row{display:flex;gap:7px;flex-wrap:wrap}
+.oct{display:flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid var(--brd2);border-radius:var(--r);cursor:pointer;font-size:var(--fs-sm);font-weight:500;background:var(--surf);color:var(--muted);transition:all .15s;min-height:var(--touch)}
+.oct:hover{border-color:var(--blue-md)}
+.oct.ocg{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok);font-weight:600}
+.oct.ocr{background:var(--danger-bg);border-color:var(--danger-bd);color:var(--danger);font-weight:600}
+.oct.oco{background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn);font-weight:600}
+
+/* ---------- In-flight bar / timer ---------- */
+.ibar{background:linear-gradient(135deg,var(--blue),var(--blue-dk));border-radius:var(--r);padding:.9rem 1.05rem;display:flex;align-items:center;gap:10px;margin-bottom:.8rem;box-shadow:var(--sh-sm)}
+.sdot{width:10px;height:10px;min-width:10px;border-radius:50%;background:#3ddc78;box-shadow:0 0 0 3px rgba(61,220,120,.25);animation:blink 1.3s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.timer{font-size:28px;font-weight:500;font-family:ui-monospace,'SF Mono','Courier New',monospace;color:var(--yellow);letter-spacing:3px;text-align:center;padding:.8rem .5rem;background:var(--blue-dk);border-radius:var(--r);margin:.55rem 0;box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.timer-sm{font-size:18px;padding:4px 13px;margin:0;letter-spacing:2px}
+
+.tozone{background:var(--blue-xs);border:2px dashed var(--blue-md);border-radius:var(--rl);padding:1.75rem 1.1rem;text-align:center}
+.tzi{width:52px;height:52px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;box-shadow:var(--sh-xs);color:var(--blue-md);font-size:23px}
+.tozone p{font-size:var(--fs-sm);color:var(--muted);margin-bottom:1.3rem;line-height:1.55}
+.bigbtn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:var(--rl);font-size:var(--fs-md);font-weight:600;cursor:pointer;border:none;transition:all .18s;min-height:52px;width:100%;max-width:320px}
+.bigbtn:active{transform:scale(.97)}
+.btn-to{background:linear-gradient(155deg,#33c56e,var(--green-dk));color:#fff;box-shadow:0 4px 14px rgba(39,174,96,.38)}
+.btn-to:hover{filter:brightness(1.05)}
+.btn-land{background:linear-gradient(155deg,#ec6e5f,var(--red-dk));color:#fff;box-shadow:0 4px 14px rgba(231,76,60,.38)}
+.btn-land:hover{filter:brightness(1.05)}
+
+.afield{background:var(--blue-lt);border:1px solid #00416b3a;border-radius:var(--r);padding:9px 11px;font-size:var(--fs-base);color:var(--blue);font-weight:600;min-height:44px;letter-spacing:.4px}
+
+.battprompt{background:var(--yellow-lt);border:1px solid #e6c20055;border-left:4px solid var(--yellow-dk);border-radius:var(--r);padding:.95rem 1.05rem;margin-top:.9rem}
+.bpttl{font-size:var(--fs-sm);font-weight:700;color:#7a6000;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+
+.evbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.evb{padding:9px 12px;border-radius:var(--r);border:1px solid var(--brd2);background:var(--surf);color:var(--muted);cursor:pointer;font-size:var(--fs-sm);font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px;min-height:var(--touch)}
+.evb:active{transform:scale(.96)}
+.evb.evb-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-bd)}
+.evb.evb-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.evlog{background:var(--surf);border-radius:var(--r);border:1px solid var(--brd);padding:.75rem;min-height:46px;font-size:var(--fs-sm)}
+.eventry{padding:5px 0;border-bottom:.5px solid var(--brd);display:flex;align-items:center;gap:8px}
+.eventry:last-child{border-bottom:none}
+.evts{font-family:ui-monospace,'SF Mono','Courier New',monospace;color:var(--blue);font-size:10.5px;font-weight:600;background:var(--blue-xs);padding:2px 7px;border-radius:5px;white-space:nowrap}
+
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.3rem;gap:8px}
+.btn{padding:10px 18px;border-radius:var(--r);font-size:var(--fs-sm);font-weight:600;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;min-height:var(--touch)}
+.btn:active{transform:scale(.97)}
+.btn-back{background:var(--surf);color:var(--blue);border:1px solid var(--brd2)}
+.btn-back:hover{border-color:var(--blue-md)}
+.btn-next{background:linear-gradient(155deg,var(--blue-md),var(--blue));color:#fff;box-shadow:0 2px 10px rgba(0,65,107,.3)}
+.btn-next:hover{filter:brightness(1.08)}
+.btn-submit{background:linear-gradient(155deg,var(--yellow),var(--yellow-dk));color:var(--blue-dk);font-weight:700;box-shadow:0 2px 12px rgba(230,194,0,.42)}
+.btn-submit:hover{filter:brightness(1.05)}
+
+.sep{height:.5px;background:var(--brd);margin:.75rem 0}
+.sep-label{text-align:center;font-size:var(--fs-xs);color:var(--muted);margin:.85rem 0;font-weight:500;letter-spacing:.02em}
+
+/* ---------- Confirmation ---------- */
+.confwrap{background:linear-gradient(160deg,var(--blue),var(--blue-dk));border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh-md)}
+.confhead{background:rgba(0,0,0,.15);padding:2.3rem 1.25rem;text-align:center;border-bottom:3px solid var(--yellow);position:relative}
+.confhead::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:16px 16px}
+.confhead i.big{font-size:44px;color:var(--yellow);display:block;margin-bottom:.85rem;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3));position:relative}
+.confhead h2{color:#fff;font-size:var(--fs-lg);font-weight:600;margin-bottom:5px;position:relative}
+.confhead p{color:rgba(255,255,255,.62);font-size:var(--fs-sm);position:relative}
+.confbody{padding:1.15rem}
+.csgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:.9rem}
+.csi{background:rgba(255,255,255,.09);border-radius:var(--r);padding:9px 11px;transition:background .2s}
+.csl{font-size:9.5px;color:rgba(255,255,255,.55);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.csv{font-size:var(--fs-sm);color:#fff;font-weight:600}
+.csi.wide{grid-column:1/-1;text-align:center}
+.conffoot{padding:0 1.25rem 1.3rem;text-align:center}
+.btn-new{background:linear-gradient(155deg,var(--yellow),var(--yellow-dk));color:var(--blue-dk);font-weight:700;padding:12px 26px;border-radius:var(--r);border:none;cursor:pointer;font-size:var(--fs-base);display:inline-flex;align-items:center;gap:7px;min-height:var(--touch);box-shadow:0 3px 12px rgba(0,0,0,.25)}
+.btn-new:hover{filter:brightness(1.05)}
+
+.hidden{display:none}
+.info-txt{font-size:var(--fs-xs);color:var(--muted);margin-bottom:9px;line-height:1.55}
+
+.step-anim{animation:stepIn .35s cubic-bezier(.4,0,.2,1)}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(min-width:600px){
+  .shell{padding:0 8px 3rem}
+  .ttext h1{font-size:var(--fs-md)}
+  .drone-grid{grid-template-columns:repeat(3,1fr)}
+  .sensor-grid{grid-template-columns:1fr 1fr}
+  .fg-2{grid-template-columns:1fr 1fr}
+  .fg-3{grid-template-columns:1fr 1fr 1fr}
+  .cl-2{grid-template-columns:1fr 1fr}
+  .csgrid{grid-template-columns:1fr 1fr}
+  .oc-row{flex-wrap:nowrap}
+}
+@media(max-width:480px){
+  :root{--fs-xs:10.5px;--fs-sm:12.5px;--fs-base:14px;--fs-md:15px;--fs-lg:16px}
+  .shell{padding:0 0 2.5rem}
+  .topbar{border-radius:0;margin-left:-4px;margin-right:-4px}
+  .ttext h1{font-size:13px}
+  .tbadge{display:none}
+  .card{border-radius:12px;padding:.9rem}
+  .drone-grid{grid-template-columns:1fr 1fr;gap:7px}
+  .drone-card:last-child{grid-column:1/-1;flex-direction:row;padding:.75rem 1rem;justify-content:flex-start;gap:12px}
+  .drone-card:last-child .dico{font-size:19px}
+  .sensor-grid{grid-template-columns:1fr}
+  .fg-2,.fg-3{grid-template-columns:1fr}
+  .fg-2 .fcol,.fg-3 .fcol{grid-column:1}
+  .fcol{grid-column:1}
+  .cl-2{grid-template-columns:1fr}
+  .csgrid{grid-template-columns:1fr}
+  .csi.wide{grid-column:1}
+  .oc-row{flex-direction:column;gap:6px}
+  .oct{width:100%}
+  .tpair,.fcrow{gap:6px}
+  .evbtns{gap:5px}
+  .evb{padding:8px 10px;font-size:11px}
+  .btn{font-size:13px;padding:10px 14px}
+  .bigbtn{font-size:var(--fs-base);padding:13px 20px}
+  .timer{font-size:24px}
+}
+@media(max-width:360px){
+  :root{--fs-base:13px;--fs-sm:12px}
+  .drone-grid{grid-template-columns:1fr}
+  .drone-card:last-child{grid-column:auto}
+  .timer{font-size:20px;letter-spacing:2px}
+}
+@media(min-width:481px) and (max-width:767px){
+  .drone-grid{grid-template-columns:repeat(3,1fr)}
+  .sensor-grid{grid-template-columns:1fr 1fr}
+  .fg-3{grid-template-columns:1fr 1fr}
+  .cl-2{grid-template-columns:1fr 1fr}
+}
+@media(min-width:768px){
+  .shell{max-width:720px}
+  .fg-3{grid-template-columns:1fr 1fr 1fr}
+  .drone-grid{grid-template-columns:repeat(3,1fr)}
+  .sensor-grid{grid-template-columns:1fr 1fr}
+  .cl-2{grid-template-columns:1fr 1fr}
+}
+</style>
+
+<div class="shell">
+
+<div class="topbar">
+  <div class="topbar-stripe"></div>
+  <div class="topbar-inner">
+    <div class="tlogo"><i class="ti ti-drone"></i></div>
+    <div class="ttext">
+      <h1>Preflight dan Postflight Form</h1>
+      <p>Lab. Penginderaan Jauh · Fak. Geografi · Universitas Gadjah Mada</p>
+    </div>
+    <div class="tbadge">1.0</div>
+  </div>
+</div>
+
+<div class="vtoast" id="vtoast"><i class="ti ti-alert-circle"></i><span id="vtmsg">Lengkapi field yang diperlukan.</span></div>
+
+<div class="prog-wrap">
+  <div class="prog-meta"><b id="prog_lbl">Bagian 1 dari 10 — Data Misi</b><span id="prog_pct">10%</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:10%"></div></div>
+  <div class="prog-dots" id="pdots"></div>
+</div>
+
+<div class="step-bar">
+  <div class="sp active" id="sp1"><i class="ti ti-clipboard-list"></i> Misi</div>
+  <div class="sp" id="sp2"><i class="ti ti-drone"></i> Drone</div>
+  <div class="sp" id="sp3"><i class="ti ti-checklist"></i> Preflight</div>
+  <div class="sp hidden" id="sp4"><i class="ti ti-camera"></i> Sensor</div>
+  <div class="sp hidden" id="sp5"><i class="ti ti-checklist"></i> Sensor PF</div>
+  <div class="sp" id="sp6"><i class="ti ti-rocket"></i> Takeoff</div>
+  <div class="sp" id="sp7"><i class="ti ti-gauge"></i> In-Flight</div>
+  <div class="sp" id="sp8"><i class="ti ti-plane-arrival"></i> Landing</div>
+  <div class="sp" id="sp9"><i class="ti ti-checklist"></i> Post CL</div>
+  <div class="sp" id="sp10"><i class="ti ti-flag"></i> Hasil</div>
+</div>
+
+<!-- STEP 1 -->
+<div id="step1">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-clipboard-list"></i></span>Data Misi</div>
+  <div class="fg fg-2">
+    <div><label class="lbl">Hari / Tanggal *</label><input type="date" id="f_date"></div>
+    <div><label class="lbl">Lokasi *</label><input type="text" id="f_loc" placeholder="Nama lokasi survei"></div>
+    <div class="fcol"><label class="lbl">Nama Misi *</label><input type="text" id="f_mission" placeholder="Contoh: Pemetaan Lahan Sawah Sleman 2026"></div>
+    <div><label class="lbl">Flight No.</label><input type="text" id="f_flightno" placeholder="F-001"></div>
+    <div><label class="lbl">RPIC / Pilot *</label><input type="text" id="f_pilot" placeholder="Nama pilot"></div>
+    <div><label class="lbl">Visual Observer</label><input type="text" id="f_observer" placeholder="Nama observer"></div>
+    <div><label class="lbl">Battery Set</label><input type="text" id="f_battset" placeholder="Set A / Set B"></div>
+    <div><label class="lbl">Battery LED</label><div class="uw"><input type="number" id="f_battled" placeholder="4" min="1" max="4"><span class="unit">Bar</span></div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-map-pin"></i></span>Koordinat dan Parameter Penerbangan</div>
+  <div class="fg fg-3">
+    <div><label class="lbl">Longitude</label><input type="number" id="f_x" step="0.000001" placeholder="110.123456" inputmode="decimal"></div>
+    <div><label class="lbl">Latitude</label><input type="number" id="f_y" step="0.000001" placeholder="-7.654321" inputmode="decimal"></div>
+    <div><label class="lbl">Elevasi</label><div class="uw"><input type="number" id="f_z" placeholder="100" inputmode="numeric"><span class="unit">m</span></div></div>
+    <div><label class="lbl">Flight Altitude *</label><div class="uw"><input type="number" id="f_alt" placeholder="120" min="0" inputmode="numeric"><span class="unit">m</span></div></div>
+    <div><label class="lbl">Flight Speed</label><div class="uw"><input type="number" id="f_speed" placeholder="7.0" step="0.1" min="0" inputmode="decimal"><span class="unit">m/s</span></div></div>
+    <div><label class="lbl">RTH Altitude</label><div class="uw"><input type="number" id="f_rth" placeholder="50" min="0" inputmode="numeric"><span class="unit">m</span></div></div>
+    <div><label class="lbl">Side Lap</label><div class="uw"><input type="number" id="f_side" placeholder="30" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+    <div><label class="lbl">Over Lap</label><div class="uw"><input type="number" id="f_over" placeholder="80" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+    <div><label class="lbl">Margin</label><div class="uw"><input type="number" id="f_margin" placeholder="50" min="0" inputmode="numeric"><span class="unit">m</span></div></div>
+  </div>
+</div>
+<div class="nav-row"><div></div><button class="btn btn-next" onclick="v1()">Pilih Drone</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div id="step2" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-drone"></i></span>Pilih Drone *</div>
+  <div class="drone-grid">
+    <div class="drone-card" onclick="pickDrone('p4m',this)"><span class="dico"><i class="ti ti-drone"></i></span><span>Phantom 4 Multispectral</span></div>
+    <div class="drone-card" onclick="pickDrone('m3m',this)"><span class="dico"><i class="ti ti-drone"></i></span><span>Mavic 3 Multispectral</span></div>
+    <div class="drone-card" onclick="pickDrone('m350',this)"><span class="dico"><i class="ti ti-drone"></i></span><span>Matrice 350 RTK</span></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(1)">Kembali</button>
+  <button class="btn btn-next" onclick="v2()">Preflight</button>
+</div>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" class="hidden">
+<div class="card">
+  <div class="ct" id="pf_title"><span class="ctb"><i class="ti ti-checklist"></i></span>Preflight Drone</div>
+  <p class="info-txt">Centang setiap item setelah selesai dikerjakan. Checklist akan terkunci setelah dilanjutkan.</p>
+  <div class="cl-grid cl-2" id="cl_drone"></div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(2)">Kembali</button>
+  <button class="btn btn-next" onclick="v3()">Lanjut</button>
+</div>
+</div>
+
+<!-- STEP 4 -->
+<div id="step4" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-camera"></i></span>Pilih Sensor Matrice 350 RTK *</div>
+  <div class="sensor-grid">
+    <div class="sensor-card" onclick="pickSensor('a450',this)"><span class="sico"><i class="ti ti-radar"></i></span><span>LiDAR A450</span></div>
+    <div class="sensor-card" onclick="pickSensor('l1',this)"><span class="sico"><i class="ti ti-radar-2"></i></span><span>LiDAR L1</span></div>
+    <div class="sensor-card" onclick="pickSensor('h20t',this)"><span class="sico"><i class="ti ti-temperature"></i></span><span>Thermal H20T</span></div>
+    <div class="sensor-card" onclick="pickSensor('hyper',this)"><span class="sico"><i class="ti ti-prism"></i></span><span>Hyperspectral CHNSpec FS50</span></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(3)">Kembali</button>
+  <button class="btn btn-next" onclick="v4()">Preflight Sensor</button>
+</div>
+</div>
+
+<!-- STEP 5 -->
+<div id="step5" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-checklist"></i></span>Preflight Sensor</div>
+  <p class="info-txt">Centang setiap item setelah selesai dikerjakan.</p>
+  <div class="cl-grid cl-2" id="cl_sensor"></div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="b45()">Kembali</button>
+  <button class="btn btn-next" onclick="v5()">Menuju Takeoff</button>
+</div>
+</div>
+
+<!-- STEP 6 -->
+<div id="step6" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-gauge"></i></span>Pemantauan Pra-Takeoff</div>
+  <div class="stag"><i class="ti ti-list-details"></i> Data Kondisi Lapangan</div>
+  <div class="fg fg-2">
+    <div><label class="lbl">Kondisi Cuaca *</label><select id="f_weather"><option value="">Pilih kondisi</option><option>Cerah</option><option>Berawan Sebagian</option><option>Berawan</option><option>Berangin</option><option>Hujan</option></select></div>
+    <div><label class="lbl">Kecepatan Angin *</label><div class="uw"><input type="number" id="f_wind" step="0.1" placeholder="2.5" min="0" inputmode="decimal"><span class="unit">m/s</span></div></div>
+    <div><label class="lbl">GPS Satelit *</label><div class="uw"><input type="number" id="f_gps" placeholder="14" min="0" max="30" inputmode="numeric"><span class="unit">sat</span></div></div>
+    <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_bv" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+    <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_bl" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+    <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_bt" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+    <div><label class="lbl">Baterai Remote</label><div class="uw"><input type="number" id="f_rc" placeholder="95" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+    <div><label class="lbl">Kecepatan Takeoff</label><div class="uw"><input type="number" id="f_tos" step="0.1" placeholder="1.5" min="0" inputmode="decimal"><span class="unit">m/s</span></div></div>
+    <div class="fcol">
+      <label class="lbl" style="margin-bottom:6px">Kalibrasi Kompas *</label>
+      <div class="tpair">
+        <div class="tog" id="comp_y" onclick="tog('comp','y')">Selesai / OK</div>
+        <div class="tog" id="comp_n" onclick="tog('comp','n')">Perlu Ulang</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-rocket"></i></span>Takeoff</div>
+  <div id="rdy_state">
+    <div class="tozone">
+      <div class="tzi"><i class="ti ti-rocket"></i></div>
+      <p>Pastikan semua checklist preflight selesai. Waktu takeoff akan dicatat otomatis saat tombol ditekan.</p>
+      <button class="bigbtn btn-to" onclick="doTakeoff()">SIAP TAKEOFF</button>
+    </div>
+  </div>
+  <div id="fly_state" class="hidden">
+    <div class="ibar">
+      <div class="sdot"></div>
+      <div style="flex:1"><div style="font-size:11px;color:rgba(255,255,255,.6)">Status</div><div style="font-size:13px;font-weight:600;color:#fff">Sedang Terbang</div></div>
+      <div style="text-align:right"><div style="font-size:11px;color:rgba(255,255,255,.6)">Waktu Takeoff</div><div style="font-size:14px;font-weight:600;color:var(--yellow)" id="to_disp">-</div></div>
+    </div>
+    <div class="timer" id="td1">00:00:00</div>
+    <div style="text-align:center;margin-top:.75rem">
+      <button class="btn btn-next" onclick="go(7)">Lanjut ke Pemantauan</button>
+    </div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="b56()">Kembali</button>
+  <div></div>
+</div>
+</div>
+
+<!-- STEP 7 -->
+<div id="step7" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-gauge"></i></span>Pemantauan Penerbangan</div>
+  <div class="ibar">
+    <div class="sdot"></div>
+    <div style="flex:1;color:#fff;font-size:13px;font-weight:600">Sedang Terbang</div>
+    <div class="timer timer-sm" id="td2">00:00:00</div>
+  </div>
+  <div class="sep-label">Catatan Kejadian Penerbangan</div>
+  <div class="evbtns">
+    <button class="evb evb-warn" onclick="logEv('Early RTH')">Early RTH</button>
+    <button class="evb evb-danger" onclick="logEv('Hard Landing')">Hard Landing</button>
+    <button class="evb evb-danger" onclick="logEv('Crashed')">Crashed</button>
+  </div>
+  <div class="evlog" id="evlog"><span style="color:var(--muted)">Belum ada kejadian dicatat.</span></div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(6)">Kembali</button>
+  <button class="btn btn-next" onclick="go(8)">Menuju Landing</button>
+</div>
+</div>
+
+<!-- STEP 8 -->
+<div id="step8" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-plane-arrival"></i></span>Landing</div>
+  <div id="pre_land">
+    <div class="ibar" style="margin-bottom:.75rem">
+      <div class="sdot"></div>
+      <div style="flex:1;color:#fff;font-size:13px;font-weight:600">Sedang Terbang</div>
+      <div class="timer timer-sm" id="td3">00:00:00</div>
+    </div>
+    <div class="tozone">
+      <div class="tzi"><i class="ti ti-plane-arrival"></i></div>
+      <p>Tekan tombol saat drone mendarat. Waktu landing dan durasi penerbangan dihitung otomatis.</p>
+      <button class="bigbtn btn-land" onclick="doLand()">LANDING SELESAI</button>
+    </div>
+  </div>
+  <div id="post_land" class="hidden">
+    <div class="stag"><i class="ti ti-clock"></i> Log Penerbangan Otomatis</div>
+    <div class="fg fg-2" style="margin-bottom:1rem">
+      <div><label class="lbl">Waktu Takeoff</label><div class="afield" id="disp_to">-</div></div>
+      <div><label class="lbl">Waktu Landing</label><div class="afield" id="disp_land">-</div></div>
+      <div class="fcol"><label class="lbl">Durasi Penerbangan</label><div class="afield" id="disp_dur" style="font-size:20px;font-family:ui-monospace,monospace;letter-spacing:2px">-</div></div>
+    </div>
+    <div class="battprompt">
+      <div class="bpttl"><i class="ti ti-battery-2"></i> Data Baterai Saat Landing *</div>
+      <div class="fg fg-2">
+        <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_lbatt" placeholder="40" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+        <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_lvolt" step="0.1" placeholder="21.5" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+        <div class="fcol"><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_ltemp" step="0.1" placeholder="42.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+      </div>
+    </div>
+    <div style="margin-top:.9rem">
+      <label class="lbl" style="margin-bottom:6px">Kondisi Fisik Drone dan Kamera *</label>
+      <div class="tpair">
+        <div class="tog" id="phys_y" onclick="tog('phys','y')">Aman / Normal</div>
+        <div class="tog" id="phys_n" onclick="tog('phys','n')">Ada Kerusakan</div>
+      </div>
+    </div>
+    <div style="margin-top:.9rem">
+      <label class="lbl" style="margin-bottom:6px">Karakteristik Penerbangan</label>
+      <div class="fcrow">
+        <div class="fcb fn" onclick="fcPick('Normal',this)">Normal</div>
+        <div class="fcb fw" onclick="fcPick('Berangin',this)">Berangin</div>
+        <div class="fcb fu" onclick="fcPick('Tidak Stabil',this)">Tidak Stabil</div>
+      </div>
+    </div>
+    <div style="margin-top:.9rem">
+      <label class="lbl">Luas Area Terpetakan</label>
+      <div class="uw"><input type="number" id="f_area" step="0.01" placeholder="5.50" min="0" inputmode="decimal"><span class="unit">ha</span></div>
+    </div>
+    <div style="margin-top:.75rem">
+      <label class="lbl">Keterangan / Catatan</label>
+      <textarea id="f_remarks" placeholder="Catatan tambahan tentang penerbangan..."></textarea>
+    </div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(7)">Kembali</button>
+  <button class="btn btn-next" onclick="v8()">Checklist Postflight</button>
+</div>
+</div>
+
+<!-- STEP 9 -->
+<div id="step9" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-checklist"></i></span>Checklist Postflight</div>
+  <p class="info-txt">Centang setiap item setelah diselesaikan di lapangan.</p>
+  <div class="cl-grid cl-2" id="cl_post"></div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(8)">Kembali</button>
+  <button class="btn btn-next" onclick="v9()">Hasil Misi</button>
+</div>
+</div>
+
+<!-- STEP 10 -->
+<div id="step10" class="hidden">
+<div class="card">
+  <div class="ct"><span class="ctb"><i class="ti ti-flag"></i></span>Hasil Misi *</div>
+  <p class="info-txt">Pilih satu status utama hasil penerbangan ini.</p>
+  <div class="oc-row" id="oc_row">
+    <div class="oct" data-c="g" onclick="pickOC(this)">Misi Sempurna</div>
+    <div class="oct" data-c="r" onclick="pickOC(this)">Gagal Takeoff</div>
+    <div class="oct" data-c="o" onclick="pickOC(this)">Early RTH</div>
+    <div class="oct" data-c="o" onclick="pickOC(this)">Hard Landing</div>
+    <div class="oct" data-c="r" onclick="pickOC(this)">Crashed</div>
+  </div>
+  <div id="evsum_wrap" class="hidden" style="margin-top:1rem">
+    <div class="sep-label">Log Kejadian Penerbangan</div>
+    <div class="evlog" id="evsum"></div>
+  </div>
+</div>
+<div class="nav-row">
+  <button class="btn btn-back" onclick="go(9)">Kembali</button>
+  <button class="btn btn-submit" onclick="doSubmit()">Submit dan Simpan</button>
+</div>
+</div>
+
+<!-- STEP 11 -->
+<div id="step11" class="hidden">
+<div class="confwrap">
+  <div class="confhead">
+    <i class="ti ti-circle-check big"></i>
+    <h2>Log Penerbangan Tersimpan</h2>
+    <p>Data preflight dan postflight berhasil dicatat.</p>
+  </div>
+  <div class="confbody">
+    <div class="csgrid" id="cs"></div>
+  </div>
+  <div class="conffoot">
+    <div style="font-size:10.5px;color:rgba(255,255,255,.42);margin-bottom:10px">Data tersimpan di localStorage browser ini.</div>
+    <button class="btn-new" onclick="resetAll()"><i class="ti ti-plus"></i> Misi Baru</button>
+  </div>
+</div>
+</div>
+
+</div>
+
+<script>
+var S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[]};
+var TI=null;
+var STEPS=10;
+var DL={p4m:'Phantom 4 Multispectral',m3m:'Mavic 3 Multispectral',m350:'Matrice 350 RTK'};
+var SL={a450:'LiDAR A450',l1:'LiDAR L1',h20t:'Thermal H20T',hyper:'Hyperspectral CHNSpec FS50'};
+var SN=['Data Misi','Pilih Drone','Preflight Drone','Pilih Sensor','Preflight Sensor','Pemantauan Pra-Takeoff','In-Flight Monitoring','Landing','Checklist Postflight','Hasil Misi'];
+var CL={
+  p4m:['Set D-RTK 2','Periksa rangka arm drone','Pasang baling-baling (arah putar)','Periksa kondisi motor','Buka pelindung kamera','Buka pelindung gimbal','Periksa baterai (fisik)','Pasang baterai','SD Card terpasang','Pasang iPad ke remote control','Hidupkan remote control','Hidupkan drone'],
+  m3m:['Set D-RTK 2','Buka dan kunci rangka arm','Buka dan kunci baling-baling','Periksa kondisi motor','Buka pelindung kamera','Buka pelindung gimbal','Periksa baterai (fisik)','Pasang baterai','SD Card terpasang','Buka dan pasang control stick','Hidupkan remote control','Hidupkan drone'],
+  m350:['Pasang landing gear','Buka dan kunci rangka arm','Geser dan putar arm lock','Buka dan kunci baling-baling','Periksa kondisi motor','Periksa baterai (fisik)','Pasang baterai','Putar toggle baterai 90 derajat hingga klik','Hidupkan remote control','Hidupkan drone'],
+  sa450:['Set GNSS PPK','Pasang kamera ke mounting','Pasang gimbal dan kamera','Pasang antena panjang GNSS','Pasang antena atas GNSS','Hidupkan LiDAR','LiDAR warming up','LiDAR record ON','Manuver figure 8'],
+  sl1:['Set D-RTK 2','Periksa kamera dan SD Card','Pasang gimbal dan kamera','Kunci gimbal lock','Lepas penutup kamera','LiDAR warming up','LiDAR siap'],
+  sh20t:['Set D-RTK 2','Periksa kamera dan SD Card','Pasang gimbal dan kamera','Kunci gimbal lock','Lepas penutup kamera'],
+  shyper:['Set D-RTK 2','Periksa fisik kamera','Pasang gimbal dan kamera','Kunci gimbal lock','Hidupkan sensor Hyperspectral','Kamera terhubung ke RC','Kalibrasi White Reference','Kamera mulai merekam','Turunkan tilt gimbal'],
+  pp4m:['Matikan drone','Matikan remote control','Lepas iPad dari RC','Lepas baterai','Lepas baling-baling','Pasang pelindung gimbal','Pasang pelindung kamera','Masukkan drone ke case','Matikan D-RTK 2'],
+  pm3m:['Matikan drone','Matikan remote control','Lepas baterai','Lipat baling-baling','Pasang pelindung gimbal','Pasang pelindung kamera','Masukkan drone ke case','Matikan D-RTK 2'],
+  pa450:['Matikan record LiDAR','Matikan LiDAR','Matikan drone','Matikan remote control','Lepas antena atas GNSS','Lepas antena panjang GNSS','Lepas kamera dari gimbal','Lepas kamera dari mounting','Lepas baterai','Lipat baling-baling','Lepas kunci dan lipat arm','Masukkan drone ke case','Lepas landing gear','Matikan GNSS PPK'],
+  pl1:['Matikan drone','Matikan remote control','Lepas kamera dari gimbal','Pasang penutup kamera','Lepas baterai','Lipat baling-baling','Lepas kunci dan lipat arm','Masukkan drone ke case','Lepas landing gear','Matikan D-RTK 2'],
+  ph20t:['Matikan drone','Matikan remote control','Lepas kamera dari gimbal','Pasang penutup kamera','Lepas baterai','Lipat baling-baling','Lepas kunci dan lipat arm','Masukkan drone ke case','Lepas landing gear','Matikan D-RTK 2'],
+  phyper:['Hentikan perekaman','Matikan drone','Matikan remote control','Pasang penutup kamera','Lepas kamera dari gimbal','Lepas baterai','Lipat baling-baling','Lepas kunci dan lipat arm','Masukkan drone ke case','Lepas landing gear','Matikan D-RTK 2']
+};
+function buildDots(){var c=document.getElementById('pdots');c.innerHTML='';for(var i=1;i<=STEPS;i++)c.innerHTML+='<div class="pdot" id="pd'+i+'"></div>';}
+function updateBar(){
+  var n=S.step;
+  for(var i=1;i<=STEPS;i++){
+    var el=document.getElementById('sp'+i);if(!el)continue;
+    el.classList.remove('active','done');
+    if(i<n)el.classList.add('done');else if(i===n)el.classList.add('active');
+    var pd=document.getElementById('pd'+i);
+    if(pd){pd.classList.remove('done','cur');if(i<n)pd.classList.add('done');else if(i===n)pd.classList.add('cur');}
+  }
+  var pct=Math.round(n/STEPS*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog_pct').textContent=pct+'%';
+  document.getElementById('prog_lbl').innerHTML='Bagian '+n+' dari '+STEPS+' — <b>'+(SN[n-1]||'')+'</b>';
+  var asp=document.querySelector('.sp.active');
+  if(asp)asp.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+function go(n){
+  var cur=document.getElementById('step'+S.step);
+  var nxt=document.getElementById('step'+n);
+  cur.classList.add('hidden');
+  nxt.classList.remove('hidden');
+  nxt.classList.add('step-anim');
+  setTimeout(function(){nxt.classList.remove('step-anim');},400);
+  S.step=n;updateBar();window.scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg){var t=document.getElementById('vtoast');document.getElementById('vtmsg').textContent=msg;t.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(function(){t.style.display='none';},3500);}
+function gv(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function buildCL(id,items,locked){
+  var c=document.getElementById(id);if(!c)return;c.innerHTML='';
+  items.forEach(function(t,i){var cid='c_'+id+'_'+i;c.innerHTML+='<div class="cli'+(locked?' locked':'')+'" onclick="clT(this)" id="ci_'+cid+'"><input type="checkbox" id="'+cid+'"'+(locked?' disabled':'')+'><label for="'+cid+'">'+t+'</label></div>';});
+}
+function clT(el){var cb=el.querySelector('input');if(!cb||cb.disabled)return;cb.checked=!cb.checked;el.classList.toggle('checked',cb.checked);}
+function lockCL(id){var c=document.getElementById(id);if(!c)return;c.querySelectorAll('.cli').forEach(function(el){el.classList.add('locked');el.onclick=null;});c.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.disabled=true;});}
+function cntCL(id){var c=document.getElementById(id);if(!c)return{t:0,c:0};return{t:c.querySelectorAll('input[type=checkbox]').length,c:c.querySelectorAll('input[type=checkbox]:checked').length};}
+function pickDrone(d,el){
+  S.drone=d;S.sensor='';
+  document.querySelectorAll('.drone-card').forEach(function(c){c.classList.remove('sel')});
+  document.querySelectorAll('.sensor-card').forEach(function(c){c.classList.remove('sel')});
+  el.classList.add('sel');
+  var isM350=(d==='m350');
+  document.getElementById('sp4').classList[isM350?'remove':'add']('hidden');
+  document.getElementById('sp5').classList[isM350?'remove':'add']('hidden');
+}
+function pickSensor(s,el){S.sensor=s;document.querySelectorAll('.sensor-card').forEach(function(c){c.classList.remove('sel')});el.classList.add('sel');buildCL('cl_sensor',CL['s'+s]);var pk={a450:'pa450',l1:'pl1',h20t:'ph20t',hyper:'phyper'};buildCL('cl_post',CL[pk[s]]);}
+function tog(k,v){S[k]=v;if(k==='comp'){document.getElementById('comp_y').className='tog'+(v==='y'?' yes-on':'');document.getElementById('comp_n').className='tog'+(v==='n'?' no-on':'');}else{document.getElementById('phys_y').className='tog'+(v==='y'?' yes-on':'');document.getElementById('phys_n').className='tog'+(v==='n'?' no-on':'');}}
+function fcPick(v,el){S.fc=v;document.querySelectorAll('.fcb').forEach(function(b){b.classList.remove('on')});el.classList.add('on');}
+function pickOC(el){S.oc=el.textContent.trim();var cm={g:'ocg',r:'ocr',o:'oco'};document.querySelectorAll('.oct').forEach(function(t){t.classList.remove('ocg','ocr','oco')});el.classList.add(cm[el.getAttribute('data-c')]);}
+function fmtT(d){return('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);}
+function fmtD(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return('0'+h).slice(-2)+':'+('0'+m).slice(-2)+':'+('0'+sc).slice(-2);}
+function startTimer(){if(TI)clearInterval(TI);TI=setInterval(function(){if(!S.toTs)return;var str=fmtD(Math.floor((Date.now()-S.toTs)/1000));['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=str;});},1000);}
+function logEv(type){var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:type});var log=document.getElementById('evlog');if(log.innerHTML.indexOf('Belum')>-1)log.innerHTML='';log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>'+type+'</div>';}
+function validatePre(){var req=[{id:'f_weather',lbl:'Kondisi Cuaca'},{id:'f_wind',lbl:'Kecepatan Angin'},{id:'f_gps',lbl:'GPS Satelit'},{id:'f_bv',lbl:'Tegangan Baterai'},{id:'f_bl',lbl:'Level Baterai'}];for(var i=0;i<req.length;i++){if(!gv(req[i].id)){toast(req[i].lbl+' wajib diisi sebelum takeoff.');return false;}}if(!S.comp){toast('Kalibrasi Kompas wajib dipilih sebelum takeoff.');return false;}return true;}
+function doTakeoff(){if(!validatePre())return;S.toTs=Date.now();var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:'TAKEOFF'});document.getElementById('to_disp').textContent=ts;document.getElementById('rdy_state').classList.add('hidden');document.getElementById('fly_state').classList.remove('hidden');startTimer();}
+function doLand(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}S.landTs=Date.now();var now=new Date();var ts=fmtT(now);S.dur=Math.floor((S.landTs-S.toTs)/1000);S.evs.push({t:ts,e:'LANDING'});document.getElementById('disp_to').textContent=fmtT(new Date(S.toTs));document.getElementById('disp_land').textContent=ts;document.getElementById('disp_dur').textContent=fmtD(S.dur);document.getElementById('pre_land').classList.add('hidden');document.getElementById('post_land').classList.remove('hidden');}
+function v1(){if(!gv('f_date')||!gv('f_loc')||!gv('f_mission')||!gv('f_pilot')){toast('Tanggal, Lokasi, Nama Misi, dan Pilot wajib diisi.');return;}if(!gv('f_alt')){toast('Flight Altitude wajib diisi.');return;}go(2);}
+function v2(){if(!S.drone){toast('Pilih drone terlebih dahulu.');return;}buildCL('cl_drone',CL[S.drone==='m350'?'m350':S.drone]);document.getElementById('pf_title').innerHTML='<span class="ctb"><i class="ti ti-checklist"></i></span>Preflight '+DL[S.drone];if(S.drone!=='m350'){var pk={p4m:'pp4m',m3m:'pm3m'};buildCL('cl_post',CL[pk[S.drone]]);}go(3);}
+function v3(){var r=cntCL('cl_drone');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_drone');if(S.drone==='m350')go(4);else go(6);}
+function v4(){if(!S.sensor){toast('Pilih sensor terlebih dahulu.');return;}go(5);}
+function v5(){var r=cntCL('cl_sensor');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_sensor');go(6);}
+function v8(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}if(!S.landTs){toast('Tekan LANDING SELESAI terlebih dahulu.');return;}if(!gv('f_lbatt')||!gv('f_lvolt')){toast('Data baterai landing wajib diisi.');return;}if(!S.phys){toast('Kondisi fisik drone wajib dipilih.');return;}go(9);}
+function v9(){var r=cntCL('cl_post');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}go(10);}
+function b45(){go(4);}
+function b56(){if(S.drone==='m350')go(5);else go(3);}
+function doSubmit(){
+  if(!S.oc){toast('Pilih hasil misi terlebih dahulu.');return;}
+  var d={misi:gv('f_mission'),tanggal:gv('f_date'),lokasi:gv('f_loc'),pilot:gv('f_pilot'),observer:gv('f_observer'),flightNo:gv('f_flightno'),battSet:gv('f_battset'),battLED:gv('f_battled'),x:gv('f_x'),y:gv('f_y'),z:gv('f_z'),altitude:gv('f_alt'),speed:gv('f_speed'),rth:gv('f_rth'),sideLap:gv('f_side'),overLap:gv('f_over'),margin:gv('f_margin'),drone:DL[S.drone]||'-',sensor:S.drone==='m350'?(SL[S.sensor]||'-'):'-',cuaca:gv('f_weather'),angin:gv('f_wind'),gps:gv('f_gps'),battVolt:gv('f_bv'),battLevel:gv('f_bl'),battTemp:gv('f_bt'),rcBatt:gv('f_rc'),takeoffSpd:gv('f_tos'),kompas:S.comp==='y'?'Selesai / OK':'Perlu Ulang',takeoffTime:S.toTs?fmtT(new Date(S.toTs)):'-',landingTime:S.landTs?fmtT(new Date(S.landTs)):'-',durasi:fmtD(S.dur),lBatt:gv('f_lbatt'),lVolt:gv('f_lvolt'),lTemp:gv('f_ltemp'),fisik:S.phys==='y'?'Aman / Normal':'Ada Kerusakan',fc:S.fc||'-',area:gv('f_area'),remarks:gv('f_remarks'),hasilMisi:S.oc,events:S.evs};
+  try{var logs=[];try{var ex=localStorage.getItem('ugm_fl');if(ex)logs=JSON.parse(ex);}catch(e){}logs.push({id:Date.now(),data:d});localStorage.setItem('ugm_fl',JSON.stringify(logs));}catch(e){}
+  var cs=document.getElementById('cs');
+  var rows=[['Misi',d.misi],['Tanggal',d.tanggal],['Lokasi',d.lokasi],['Pilot',d.pilot],['Flight No.',d.flightNo||'-'],['Drone',d.drone],['Sensor',d.sensor],['Altitude',d.altitude?d.altitude+' m':'-'],['Cuaca',d.cuaca],['Angin',d.angin?d.angin+' m/s':'-'],['GPS',d.gps?d.gps+' sat':'-'],['Baterai Awal',d.battLevel?d.battLevel+'%':'-'],['Takeoff',d.takeoffTime],['Landing',d.landingTime],['DURASI','__TIMER__'],['Baterai Landing',d.lBatt?d.lBatt+'%':'-'],['Tegangan Landing',d.lVolt?d.lVolt+' V':'-'],['Kondisi Fisik',d.fisik],['Karakteristik',d.fc],['Hasil Misi',d.hasilMisi]];
+  var html='';
+  rows.forEach(function(r){if(r[1]==='__TIMER__'){html+='<div class="csi wide"><div class="csl">Durasi Penerbangan</div><div class="csv" style="font-size:22px;font-family:ui-monospace,monospace;letter-spacing:3px;color:var(--yellow)">'+d.durasi+'</div></div>';}else{html+='<div class="csi"><div class="csl">'+r[0]+'</div><div class="csv">'+(r[1]||'-')+'</div></div>';}});
+  cs.innerHTML=html;
+  if(d.events&&d.events.length>0){var es=document.getElementById('evsum');es.innerHTML=d.events.map(function(e){return'<div class="eventry"><span class="evts">'+e.t+'</span>'+e.e+'</div>';}).join('');document.getElementById('evsum_wrap').classList.remove('hidden');}
+  go(11);
+}
+function resetAll(){
+  if(TI)clearInterval(TI);TI=null;
+  S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[]};
+  document.querySelectorAll('input:not([type=checkbox]),select,textarea').forEach(function(e){e.value='';});
+  document.querySelectorAll('input[type=checkbox]').forEach(function(e){e.checked=false;});
+  document.querySelectorAll('.cli').forEach(function(e){e.classList.remove('checked','locked');e.onclick=function(){clT(this);};e.querySelector('input')&&(e.querySelector('input').disabled=false);});
+  document.querySelectorAll('.drone-card,.sensor-card').forEach(function(e){e.classList.remove('sel');});
+  document.querySelectorAll('.oct').forEach(function(e){e.classList.remove('ocg','ocr','oco');});
+  document.querySelectorAll('.fcb').forEach(function(e){e.classList.remove('on');});
+  ['comp_y','comp_n','phys_y','phys_n'].forEach(function(id){var el=document.getElementById(id);if(el)el.className='tog';});
+  document.getElementById('sp4').classList.add('hidden');
+  document.getElementById('sp5').classList.add('hidden');
+  document.getElementById('rdy_state').classList.remove('hidden');
+  document.getElementById('fly_state').classList.add('hidden');
+  document.getElementById('pre_land').classList.remove('hidden');
+  document.getElementById('post_land').classList.add('hidden');
+  ['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='00:00:00';});
+  document.getElementById('evlog').innerHTML='<span style="color:var(--muted)">Belum ada kejadian dicatat.</span>';
+  document.getElementById('evsum_wrap').classList.add('hidden');
+  go(1);
+}
+buildDots();updateBar();
+</script>
