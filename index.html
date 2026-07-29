@@ -135,6 +135,14 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
 .tog.yes-on{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok);font-weight:600}
 .tog.no-on{background:var(--danger-bg);border-color:var(--danger-bd);color:var(--danger);font-weight:600}
 
+.tog-single{padding:12px;border:1px solid var(--brd2);border-radius:var(--r);font-size:var(--fs-sm);font-weight:500;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf);color:var(--muted);min-height:var(--touch);display:flex;align-items:center;justify-content:center;gap:7px}
+.tog-single:hover{border-color:var(--blue-md)}
+.tog-single.yes-on{background:var(--ok-bg);border-color:var(--ok-bd);color:var(--ok);font-weight:600}
+
+.battpair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.battcol{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:.75rem;display:flex;flex-direction:column;gap:9px}
+.battcol-h{font-size:10.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;text-align:center;background:var(--blue-xs);border-radius:6px;padding:4px 0;margin-bottom:2px}
+
 .fcrow{display:flex;gap:7px}
 .fcb{flex:1;padding:10px 6px;border:1px solid var(--brd2);border-radius:var(--r);text-align:center;cursor:pointer;font-size:var(--fs-sm);font-weight:500;background:var(--surf);color:var(--muted);transition:all .15s;min-height:var(--touch);display:flex;align-items:center;justify-content:center;gap:5px}
 .fcb:hover{border-color:var(--blue-md)}
@@ -440,27 +448,40 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
     <div><label class="lbl">Kondisi Cuaca *</label><select id="f_weather"><option value="">Pilih kondisi</option><option>Cerah</option><option>Berawan Sebagian</option><option>Berawan</option><option>Berangin</option><option>Hujan</option></select></div>
     <div><label class="lbl">Kecepatan Angin *</label><div class="uw"><input type="number" id="f_wind" step="0.1" placeholder="2.5" min="0" inputmode="decimal"><span class="unit">m/s</span></div></div>
     <div><label class="lbl">GPS Satelit *</label><div class="uw"><input type="number" id="f_gps" placeholder="14" min="0" max="30" inputmode="numeric"><span class="unit">sat</span></div></div>
-    <div><label class="lbl">Tegangan Baterai 1 *</label><div class="uw"><input type="number" id="f_bv" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
-    <div><label class="lbl">Level Baterai 1 *</label><div class="uw"><input type="number" id="f_bl" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
-    <div><label class="lbl">Suhu Baterai 1</label><div class="uw"><input type="number" id="f_bt" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
-    <div class="fcol hidden" id="batt2_wrap">
-      <div class="stag" style="margin-top:2px"><i class="ti ti-battery-2"></i> Baterai 2 — Matrice 350 RTK (Dual Battery)</div>
-      <div class="fg fg-2">
-        <div><label class="lbl">Tegangan Baterai 2 *</label><div class="uw"><input type="number" id="f_bv2" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
-        <div><label class="lbl">Level Baterai 2 *</label><div class="uw"><input type="number" id="f_bl2" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
-        <div><label class="lbl">Suhu Baterai 2</label><div class="uw"><input type="number" id="f_bt2" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
-      </div>
-    </div>
     <div><label class="lbl">Baterai Remote</label><div class="uw"><input type="number" id="f_rc" placeholder="95" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
     <div><label class="lbl">Kecepatan Takeoff</label><div class="uw"><input type="number" id="f_tos" step="0.1" placeholder="1.5" min="0" inputmode="decimal"><span class="unit">m/s</span></div></div>
     <div class="fcol">
       <label class="lbl" style="margin-bottom:6px">Kalibrasi Kompas *</label>
-      <div class="tpair">
-        <div class="tog" id="comp_y" onclick="tog('comp','y')">Selesai / OK</div>
-        <div class="tog" id="comp_n" onclick="tog('comp','n')">Perlu Ulang</div>
-      </div>
+      <div class="tog-single" id="comp_y" onclick="tog('comp','y')"> Kalibrasi Kompas Selesai / OK </div>
     </div>
   </div>
+</div>
+<div class="card">
+  <div class="stag" style="margin-top:0"><i class="ti ti-battery-charging"></i> Data Kondisi Baterai</div>
+  <div class="fcol" style="margin-bottom:.8rem">
+    <label class="lbl">Set Baterai (Take Off)</label>
+    <select id="f_setnum">
+      <option value="1" selected>Set 1</option>
+      <option value="2">Set 2</option>
+      <option value="3">Set 3</option>
+      <option value="4">Set 4</option>
+    </select>
+  </div>
+  <div class="battpair">
+    <div class="battcol">
+      <div class="battcol-h">Set A</div>
+      <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_bv" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+      <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_bl" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+      <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_bt" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+    </div>
+    <div class="battcol" id="batt2_wrap">
+      <div class="battcol-h">Set B</div>
+      <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_bv2" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+      <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_bl2" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+      <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_bt2" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+    </div>
+  </div>
+  <p class="info-txt" style="margin-top:.6rem">Kolom <b>Set B</b> hanya berlaku untuk Matrice 350 RTK (dual battery).</p>
 </div>
 <div class="card">
   <div class="ct"><span class="ctb"><i class="ti ti-plane-departure"></i></span>Takeoff</div>
@@ -510,19 +531,62 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
   </div>
   <div class="sep-label">Catatan Kejadian Penerbangan</div>
   <div class="evbtns">
-    <button class="evb evb-info" onclick="openHotSwap()">Hot-Swap Baterai</button>
-    <button class="evb evb-warn" onclick="logEv('Early RTH')">Early RTH</button>
-    <button class="evb evb-danger" onclick="logEv('Hard Landing')">Hard Landing</button>
-    <button class="evb evb-danger" onclick="logEv('Crashed')">Crashed</button>
+    <button class="evb evb-info hidden" id="btn_hotswap" onclick="openHotSwap(null)">Hot-Swap Baterai</button>
+    <button class="evb evb-warn" onclick="openEventPanel('Early RTH')">Early RTH</button>
+    <button class="evb evb-danger" onclick="openEventPanel('Hard Landing')">Hard Landing</button>
+    <button class="evb evb-danger" onclick="openEventPanel('Crashed')">Crashed</button>
   </div>
+
+  <div class="hswrap hidden" id="ev_panel">
+    <div class="stag" style="margin-top:0" id="ev_panel_title"><i class="ti ti-alert-triangle"></i> Detail Kejadian</div>
+    <div class="fcol">
+      <label class="lbl">Catatan / Keterangan</label>
+      <textarea id="ev_note" placeholder="Opsional, jelaskan kejadian secara singkat..."></textarea>
+    </div>
+    <div id="ev_rth_continue" class="hidden fcol" style="margin-top:.7rem">
+      <label class="lbl" style="margin-bottom:6px">Apakah penerbangan dilanjutkan?</label>
+      <div class="tpair">
+        <div class="tog" id="ev_cont_y" onclick="setEvContinue('y')">Lanjut</div>
+        <div class="tog" id="ev_cont_n" onclick="setEvContinue('n')">Henti</div>
+      </div>
+    </div>
+    <div id="ev_swap_q" class="hidden fcol" style="margin-top:.7rem">
+      <label class="lbl" style="margin-bottom:6px">Apakah melakukan pergantian baterai?</label>
+      <div class="tpair">
+        <div class="tog" id="ev_swap_y" onclick="setEvSwap('y')">Ya</div>
+        <div class="tog" id="ev_swap_n" onclick="setEvSwap('n')">Tidak</div>
+      </div>
+    </div>
+    <div class="nav-row" style="margin-top:.7rem">
+      <button class="btn btn-back" type="button" onclick="cancelEventPanel()">Batal</button>
+      <button class="btn btn-next" type="button" onclick="confirmEventPanel()">Catat Kejadian</button>
+    </div>
+  </div>
+
   <div class="hswrap hidden" id="hs_panel">
     <div class="stag" style="margin-top:0"><i class="ti ti-battery-charging"></i> Data Hot-Swap Baterai</div>
-    <p class="info-txt">RTH ke titik home, ganti baterai, lalu lanjutkan misi kembali ke titik terakhir pemetaan.</p>
-    <div class="fg fg-2">
-      <div class="fcol"><label class="lbl">Set Baterai Baru</label><input type="text" id="hs_battset" placeholder="Set C"></div>
-      <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="hs_bv" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
-      <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="hs_bl" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
-      <div class="fcol"><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="hs_bt" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+    <p class="info-txt" id="hs_count_lbl">RTH ke titik home, ganti baterai, lalu lanjutkan misi kembali ke titik terakhir pemetaan.</p>
+    <div class="fcol" style="margin-bottom:.7rem">
+      <label class="lbl">Set Baterai Baru</label>
+      <select id="hs_setnum">
+        <option value="2">Set 2</option>
+        <option value="3">Set 3</option>
+        <option value="4">Set 4</option>
+      </select>
+    </div>
+    <div class="battpair">
+      <div class="battcol">
+        <div class="battcol-h">Set A</div>
+        <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="hs_bv" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+        <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="hs_bl" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+        <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="hs_bt" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+      </div>
+      <div class="battcol">
+        <div class="battcol-h">Set B</div>
+        <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="hs_bv2" step="0.1" placeholder="25.2" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+        <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="hs_bl2" placeholder="100" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+        <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="hs_bt2" step="0.1" placeholder="28.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+      </div>
     </div>
     <div class="nav-row" style="margin-top:.7rem">
       <button class="btn btn-back" type="button" onclick="cancelHotSwap()">Batal</button>
@@ -562,11 +626,33 @@ input[type=checkbox]:disabled{opacity:.55;cursor:default}
     </div>
     <div class="battprompt">
       <div class="bpttl"><i class="ti ti-battery-2"></i> Data Baterai Saat Landing *</div>
-      <div class="fg fg-2">
-        <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_lbatt" placeholder="40" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
-        <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_lvolt" step="0.1" placeholder="21.5" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
-        <div class="fcol"><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_ltemp" step="0.1" placeholder="42.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+      <div class="fg fg-2" style="margin-bottom:.7rem">
+        <div><label class="lbl">Total Set Baterai Digunakan</label><div class="afield" id="disp_total_sets">-</div></div>
+        <div>
+          <label class="lbl">Set Baterai (Saat Landing)</label>
+          <select id="f_land_setnum">
+            <option value="1">Set 1</option>
+            <option value="2">Set 2</option>
+            <option value="3">Set 3</option>
+            <option value="4">Set 4</option>
+          </select>
+        </div>
       </div>
+      <div class="battpair">
+        <div class="battcol">
+          <div class="battcol-h">Set A</div>
+          <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_lvolt" step="0.1" placeholder="21.5" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+          <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_lbatt" placeholder="40" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+          <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_ltemp" step="0.1" placeholder="42.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+        </div>
+        <div class="battcol" id="landbatt2_wrap">
+          <div class="battcol-h">Set B</div>
+          <div><label class="lbl">Tegangan Baterai *</label><div class="uw"><input type="number" id="f_lvolt2" step="0.1" placeholder="21.5" min="0" inputmode="decimal"><span class="unit">V</span></div></div>
+          <div><label class="lbl">Level Baterai *</label><div class="uw"><input type="number" id="f_lbatt2" placeholder="40" min="0" max="100" inputmode="numeric"><span class="unit">%</span></div></div>
+          <div><label class="lbl">Suhu Baterai</label><div class="uw"><input type="number" id="f_ltemp2" step="0.1" placeholder="42.0" inputmode="decimal"><span class="unit">°C</span></div></div>
+        </div>
+      </div>
+      <p class="info-txt" style="margin-top:.6rem">Kolom <b>Set B</b> hanya berlaku untuk Matrice 350 RTK (dual battery).</p>
     </div>
     <div class="stag" style="margin-top:1rem"><i class="ti ti-camera"></i> Dokumentasi Foto Pasca-Landing *</div>
     <div class="photobox" id="photo_land_empty">
@@ -755,26 +841,122 @@ function pickDrone(d,el){
   document.getElementById('sp4').classList[isM350?'remove':'add']('hidden');
   document.getElementById('sp5').classList[isM350?'remove':'add']('hidden');
   document.getElementById('batt2_wrap').classList[isM350?'remove':'add']('hidden');
+  document.getElementById('btn_hotswap').classList[isM350?'remove':'add']('hidden');
+  document.getElementById('landbatt2_wrap').classList[isM350?'remove':'add']('hidden');
 }
 function pickSensor(s,el){S.sensor=s;document.querySelectorAll('.sensor-card').forEach(function(c){c.classList.remove('sel')});el.classList.add('sel');buildCL('cl_sensor',CL['s'+s]);var pk={a450:'pa450',l1:'pl1',h20t:'ph20t',hyper:'phyper'};buildCL('cl_post',CL[pk[s]]);}
-function tog(k,v){S[k]=v;if(k==='comp'){document.getElementById('comp_y').className='tog'+(v==='y'?' yes-on':'');document.getElementById('comp_n').className='tog'+(v==='n'?' no-on':'');}else{document.getElementById('phys_y').className='tog'+(v==='y'?' yes-on':'');document.getElementById('phys_n').className='tog'+(v==='n'?' no-on':'');}}
+function tog(k,v){
+  if(k==='comp'){
+    S.comp=(S.comp==='y')?'':'y';
+    document.getElementById('comp_y').className='tog-single'+(S.comp==='y'?' yes-on':'');
+    return;
+  }
+  S[k]=v;
+  document.getElementById('phys_y').className='tog'+(v==='y'?' yes-on':'');
+  document.getElementById('phys_n').className='tog'+(v==='n'?' no-on':'');
+}
 function fcPick(v,el){S.fc=v;document.querySelectorAll('.fcb').forEach(function(b){b.classList.remove('on')});el.classList.add('on');}
 function pickOC(el){S.oc=el.textContent.trim();var cm={g:'ocg',r:'ocr',o:'oco'};document.querySelectorAll('.oct').forEach(function(t){t.classList.remove('ocg','ocr','oco')});el.classList.add(cm[el.getAttribute('data-c')]);}
 function fmtT(d){return('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);}
 function fmtD(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return('0'+h).slice(-2)+':'+('0'+m).slice(-2)+':'+('0'+sc).slice(-2);}
 function startTimer(){if(TI)clearInterval(TI);TI=setInterval(function(){if(!S.toTs)return;var str=fmtD(Math.floor((Date.now()-S.toTs)/1000));['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent=str;});},1000);}
+var HOTSWAP_MAX=3;
+var EV_KIND=null, EV_CONTINUE=null, EV_SWAP=null, EV_LINKED=false;
+
 function logEv(type){var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:type});var log=document.getElementById('evlog');if(log.innerHTML.indexOf('Belum')>-1)log.innerHTML='';log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>'+type+'</div>';}
-function openHotSwap(){document.getElementById('hs_panel').classList.remove('hidden');document.getElementById('hs_panel').scrollIntoView({behavior:'smooth',block:'nearest'});}
-function cancelHotSwap(){document.getElementById('hs_panel').classList.add('hidden');['hs_battset','hs_bv','hs_bl','hs_bt'].forEach(function(id){document.getElementById(id).value='';});}
+
+function openHotSwap(linkedFromEvent){
+  if(S.hotswaps.length>=HOTSWAP_MAX){
+    toast('Hot-Swap sudah mencapai batas maksimal ('+HOTSWAP_MAX+'x, total 4 set baterai).');
+    return;
+  }
+  EV_LINKED=!!linkedFromEvent;
+  document.getElementById('hs_setnum').value=String(2+S.hotswaps.length);
+  document.getElementById('hs_count_lbl').textContent='RTH ke titik home, ganti baterai, lalu lanjutkan misi kembali ke titik terakhir pemetaan. ('+S.hotswaps.length+'/'+HOTSWAP_MAX+' Hot-Swap terpakai)';
+  document.getElementById('hs_panel').classList.remove('hidden');
+  document.getElementById('hs_panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function cancelHotSwap(){
+  document.getElementById('hs_panel').classList.add('hidden');
+  ['hs_bv','hs_bl','hs_bt','hs_bv2','hs_bl2','hs_bt2'].forEach(function(id){document.getElementById(id).value='';});
+  if(EV_LINKED){EV_LINKED=false;finalizeEventLog(false);}
+}
 function confirmHotSwap(){
-  var bs=gv('hs_battset'),bv=gv('hs_bv'),bl=gv('hs_bl'),bt=gv('hs_bt');
-  if(!bv||!bl){toast('Tegangan dan Level baterai baru wajib diisi.');return;}
+  var setnum=gv('hs_setnum'),bv=gv('hs_bv'),bl=gv('hs_bl'),bt=gv('hs_bt'),bv2=gv('hs_bv2'),bl2=gv('hs_bl2'),bt2=gv('hs_bt2');
+  if(!bv||!bl||!bv2||!bl2){toast('Tegangan dan Level baterai Set A & Set B wajib diisi.');return;}
   var now=new Date();var ts=fmtT(now);
-  S.hotswaps.push({t:ts,battSet:bs||'-',bv:bv,bl:bl,bt:bt||'-'});
-  S.evs.push({t:ts,e:'Hot-Swap Baterai'+(bs?(' — '+bs):'')+' ('+bv+'V, '+bl+'%)'});
+  S.hotswaps.push({t:ts,setnum:setnum,bv:bv,bl:bl,bt:bt||'-',bv2:bv2,bl2:bl2,bt2:bt2||'-'});
+  var summary='Hot-Swap Baterai — Set '+setnum+' (A: '+bv+'V/'+bl+'%, B: '+bv2+'V/'+bl2+'%)';
+  S.evs.push({t:ts,e:summary});
   var log=document.getElementById('evlog');if(log.innerHTML.indexOf('Belum')>-1)log.innerHTML='';
-  log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>Hot-Swap Baterai'+(bs?(' — '+bs):'')+' ('+bv+'V, '+bl+'%)</div>';
-  cancelHotSwap();
+  log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>'+summary+'</div>';
+  document.getElementById('hs_panel').classList.add('hidden');
+  ['hs_bv','hs_bl','hs_bt','hs_bv2','hs_bl2','hs_bt2'].forEach(function(id){document.getElementById(id).value='';});
+  if(EV_LINKED){EV_LINKED=false;finalizeEventLog(true);}
+}
+
+function openEventPanel(kind){
+  EV_KIND=kind;EV_CONTINUE=null;EV_SWAP=null;
+  document.getElementById('ev_note').value='';
+  document.getElementById('ev_panel_title').innerHTML='<i class="ti ti-alert-triangle"></i> Detail Kejadian — '+kind;
+  document.getElementById('ev_cont_y').className='tog';
+  document.getElementById('ev_cont_n').className='tog';
+  document.getElementById('ev_swap_y').className='tog';
+  document.getElementById('ev_swap_n').className='tog';
+  document.getElementById('ev_swap_q').classList.add('hidden');
+  document.getElementById('ev_rth_continue').classList[kind==='Early RTH'?'remove':'add']('hidden');
+  document.getElementById('ev_panel').classList.remove('hidden');
+  document.getElementById('ev_panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function cancelEventPanel(){
+  document.getElementById('ev_panel').classList.add('hidden');
+  EV_KIND=null;EV_CONTINUE=null;EV_SWAP=null;
+}
+function setEvContinue(v){
+  EV_CONTINUE=v;
+  document.getElementById('ev_cont_y').className='tog'+(v==='y'?' yes-on':'');
+  document.getElementById('ev_cont_n').className='tog'+(v==='n'?' no-on':'');
+  if(v==='y'&&S.drone==='m350'){
+    document.getElementById('ev_swap_q').classList.remove('hidden');
+  }else{
+    document.getElementById('ev_swap_q').classList.add('hidden');
+    EV_SWAP=null;
+    document.getElementById('ev_swap_y').className='tog';
+    document.getElementById('ev_swap_n').className='tog';
+  }
+}
+function setEvSwap(v){
+  if(v==='y'&&S.hotswaps.length>=HOTSWAP_MAX){
+    toast('Hot-Swap sudah mencapai batas maksimal ('+HOTSWAP_MAX+'x, total 4 set baterai).');
+    return;
+  }
+  EV_SWAP=v;
+  document.getElementById('ev_swap_y').className='tog'+(v==='y'?' yes-on':'');
+  document.getElementById('ev_swap_n').className='tog'+(v==='n'?' no-on':'');
+}
+function confirmEventPanel(){
+  if(EV_KIND==='Early RTH'&&!EV_CONTINUE){toast('Pilih apakah penerbangan dilanjutkan atau dihentikan.');return;}
+  if(EV_CONTINUE==='y'&&S.drone==='m350'&&!EV_SWAP){toast('Pilih apakah dilakukan pergantian baterai.');return;}
+  if(EV_SWAP==='y'){
+    document.getElementById('ev_panel').classList.add('hidden');
+    openHotSwap(true);
+    return;
+  }
+  finalizeEventLog(false);
+}
+function finalizeEventLog(didSwap){
+  var note=gv('ev_note');
+  var parts=[EV_KIND];
+  if(EV_KIND==='Early RTH'&&EV_CONTINUE){parts.push(EV_CONTINUE==='y'?'Misi Dilanjutkan':'Misi Dihentikan');}
+  if(didSwap){parts.push('Ganti Baterai Tercatat');}
+  if(note){parts.push('Catatan: '+note);}
+  var text=parts.join(' — ');
+  var now=new Date();var ts=fmtT(now);
+  S.evs.push({t:ts,e:text});
+  var log=document.getElementById('evlog');if(log.innerHTML.indexOf('Belum')>-1)log.innerHTML='';
+  log.innerHTML+='<div class="eventry"><span class="evts">'+ts+'</span>'+text+'</div>';
+  document.getElementById('ev_panel').classList.add('hidden');
+  EV_KIND=null;EV_CONTINUE=null;EV_SWAP=null;
 }
 var CAM_STREAM=null;
 var CAM_KIND=null;
@@ -844,22 +1026,44 @@ function validatePre(){
   return true;
 }
 function doTakeoff(){if(!validatePre())return;S.toTs=Date.now();var now=new Date();var ts=fmtT(now);S.evs.push({t:ts,e:'TAKEOFF'});document.getElementById('to_disp').textContent=ts;document.getElementById('rdy_state').classList.add('hidden');document.getElementById('fly_state').classList.remove('hidden');startTimer();}
-function doLand(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}S.landTs=Date.now();var now=new Date();var ts=fmtT(now);S.dur=Math.floor((S.landTs-S.toTs)/1000);S.evs.push({t:ts,e:'LANDING'});document.getElementById('disp_to').textContent=fmtT(new Date(S.toTs));document.getElementById('disp_land').textContent=ts;document.getElementById('disp_dur').textContent=fmtD(S.dur);document.getElementById('pre_land').classList.add('hidden');document.getElementById('post_land').classList.remove('hidden');}
+function doLand(){
+  if(!S.toTs){toast('Takeoff belum dilakukan.');return;}
+  S.landTs=Date.now();var now=new Date();var ts=fmtT(now);
+  S.dur=Math.floor((S.landTs-S.toTs)/1000);
+  S.evs.push({t:ts,e:'LANDING'});
+  document.getElementById('disp_to').textContent=fmtT(new Date(S.toTs));
+  document.getElementById('disp_land').textContent=ts;
+  document.getElementById('disp_dur').textContent=fmtD(S.dur);
+  var totalSets=1+S.hotswaps.length;
+  document.getElementById('disp_total_sets').textContent=totalSets+' Set';
+  document.getElementById('f_land_setnum').value=String(Math.min(totalSets,4));
+  document.getElementById('pre_land').classList.add('hidden');
+  document.getElementById('post_land').classList.remove('hidden');
+}
 function v1(){if(!gv('f_date')||!gv('f_loc')||!gv('f_mission')||!gv('f_pilot')){toast('Tanggal, Lokasi, Nama Misi, dan Pilot wajib diisi.');return;}if(!gv('f_alt')){toast('Flight Altitude wajib diisi.');return;}go(2);}
 function v2(){if(!S.drone){toast('Pilih drone terlebih dahulu.');return;}buildCL('cl_drone',CL[S.drone==='m350'?'m350':S.drone]);document.getElementById('pf_title').innerHTML='<span class="ctb"><i class="ti ti-checklist"></i></span>Preflight '+DL[S.drone];if(S.drone!=='m350'){var pk={p4m:'pp4m',m3m:'pm3m'};buildCL('cl_post',CL[pk[S.drone]]);}go(3);}
 function v3(){var r=cntCL('cl_drone');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_drone');if(S.drone==='m350')go(4);else go(6);}
 function v4(){if(!S.sensor){toast('Pilih sensor terlebih dahulu.');return;}go(5);}
 function v5(){var r=cntCL('cl_sensor');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}lockCL('cl_sensor');go(6);}
-function v8(){if(!S.toTs){toast('Takeoff belum dilakukan.');return;}if(!S.landTs){toast('Tekan LANDING SELESAI terlebih dahulu.');return;}if(!gv('f_lbatt')||!gv('f_lvolt')){toast('Data baterai landing wajib diisi.');return;}if(!S.photoLand){toast('Ambil foto dokumentasi pasca-landing terlebih dahulu.');return;}if(!S.phys){toast('Kondisi fisik drone wajib dipilih.');return;}go(9);}
+function v8(){
+  if(!S.toTs){toast('Takeoff belum dilakukan.');return;}
+  if(!S.landTs){toast('Tekan LANDING SELESAI terlebih dahulu.');return;}
+  if(!gv('f_lbatt')||!gv('f_lvolt')){toast('Data baterai landing Set A wajib diisi.');return;}
+  if(S.drone==='m350'&&(!gv('f_lbatt2')||!gv('f_lvolt2'))){toast('Data baterai landing Set B wajib diisi.');return;}
+  if(!S.photoLand){toast('Ambil foto dokumentasi pasca-landing terlebih dahulu.');return;}
+  if(!S.phys){toast('Kondisi fisik drone wajib dipilih.');return;}
+  go(9);
+}
 function v9(){var r=cntCL('cl_post');if(r.c<r.t){if(!confirm('Masih '+(r.t-r.c)+' item belum dicentang. Tetap lanjutkan?'))return;}go(10);}
 function b45(){go(4);}
 function b56(){if(S.drone==='m350')go(5);else go(3);}
 function doSubmit(){
   if(!S.oc){toast('Pilih hasil misi terlebih dahulu.');return;}
-  var d={misi:gv('f_mission'),tanggal:gv('f_date'),lokasi:gv('f_loc'),pilot:gv('f_pilot'),observer:gv('f_observer'),flightNo:gv('f_flightno'),battSet:gv('f_battset'),battLED:gv('f_battled'),x:gv('f_x'),y:gv('f_y'),z:gv('f_z'),altitude:gv('f_alt'),speed:gv('f_speed'),rth:gv('f_rth'),sideLap:gv('f_side'),overLap:gv('f_over'),margin:gv('f_margin'),drone:DL[S.drone]||'-',sensor:S.drone==='m350'?(SL[S.sensor]||'-'):'-',cuaca:gv('f_weather'),angin:gv('f_wind'),gps:gv('f_gps'),battVolt:gv('f_bv'),battLevel:gv('f_bl'),battTemp:gv('f_bt'),battVolt2:S.drone==='m350'?gv('f_bv2'):'',battLevel2:S.drone==='m350'?gv('f_bl2'):'',battTemp2:S.drone==='m350'?gv('f_bt2'):'',rcBatt:gv('f_rc'),takeoffSpd:gv('f_tos'),kompas:S.comp==='y'?'Selesai / OK':'Perlu Ulang',takeoffTime:S.toTs?fmtT(new Date(S.toTs)):'-',landingTime:S.landTs?fmtT(new Date(S.landTs)):'-',durasi:fmtD(S.dur),lBatt:gv('f_lbatt'),lVolt:gv('f_lvolt'),lTemp:gv('f_ltemp'),fisik:S.phys==='y'?'Aman / Normal':'Ada Kerusakan',fc:S.fc||'-',area:gv('f_area'),remarks:gv('f_remarks'),hasilMisi:S.oc,events:S.evs,hotswaps:S.hotswaps,photoPre:S.photoPre||'',photoLand:S.photoLand||''};
+  var totalSets=1+S.hotswaps.length;
+  var d={misi:gv('f_mission'),tanggal:gv('f_date'),lokasi:gv('f_loc'),pilot:gv('f_pilot'),observer:gv('f_observer'),flightNo:gv('f_flightno'),battSet:gv('f_battset'),battLED:gv('f_battled'),x:gv('f_x'),y:gv('f_y'),z:gv('f_z'),altitude:gv('f_alt'),speed:gv('f_speed'),rth:gv('f_rth'),sideLap:gv('f_side'),overLap:gv('f_over'),margin:gv('f_margin'),drone:DL[S.drone]||'-',sensor:S.drone==='m350'?(SL[S.sensor]||'-'):'-',cuaca:gv('f_weather'),angin:gv('f_wind'),gps:gv('f_gps'),setNum:gv('f_setnum'),battVolt:gv('f_bv'),battLevel:gv('f_bl'),battTemp:gv('f_bt'),battVolt2:S.drone==='m350'?gv('f_bv2'):'',battLevel2:S.drone==='m350'?gv('f_bl2'):'',battTemp2:S.drone==='m350'?gv('f_bt2'):'',rcBatt:gv('f_rc'),takeoffSpd:gv('f_tos'),kompas:S.comp==='y'?'Selesai / OK':'Belum Dikonfirmasi',takeoffTime:S.toTs?fmtT(new Date(S.toTs)):'-',landingTime:S.landTs?fmtT(new Date(S.landTs)):'-',durasi:fmtD(S.dur),totalSets:totalSets,landSetNum:gv('f_land_setnum'),lBatt:gv('f_lbatt'),lVolt:gv('f_lvolt'),lTemp:gv('f_ltemp'),lBatt2:S.drone==='m350'?gv('f_lbatt2'):'',lVolt2:S.drone==='m350'?gv('f_lvolt2'):'',lTemp2:S.drone==='m350'?gv('f_ltemp2'):'',fisik:S.phys==='y'?'Aman / Normal':'Ada Kerusakan',fc:S.fc||'-',area:gv('f_area'),remarks:gv('f_remarks'),hasilMisi:S.oc,events:S.evs,hotswaps:S.hotswaps,photoPre:S.photoPre||'',photoLand:S.photoLand||''};
   try{var logs=[];try{var ex=localStorage.getItem('ugm_fl');if(ex)logs=JSON.parse(ex);}catch(e){}logs.push({id:Date.now(),data:d});localStorage.setItem('ugm_fl',JSON.stringify(logs));}catch(e){}
   var cs=document.getElementById('cs');
-  var rows=[['Misi',d.misi],['Tanggal',d.tanggal],['Lokasi',d.lokasi],['Pilot',d.pilot],['Flight No.',d.flightNo||'-'],['Drone',d.drone],['Sensor',d.sensor],['Altitude',d.altitude?d.altitude+' m':'-'],['Cuaca',d.cuaca],['Angin',d.angin?d.angin+' m/s':'-'],['GPS',d.gps?d.gps+' sat':'-'],['Baterai Awal',d.battLevel?d.battLevel+'%':'-'],['Takeoff',d.takeoffTime],['Landing',d.landingTime],['DURASI','__TIMER__'],['Baterai Landing',d.lBatt?d.lBatt+'%':'-'],['Tegangan Landing',d.lVolt?d.lVolt+' V':'-'],['Kondisi Fisik',d.fisik],['Karakteristik',d.fc],['Hasil Misi',d.hasilMisi]];
+  var rows=[['Misi',d.misi],['Tanggal',d.tanggal],['Lokasi',d.lokasi],['Pilot',d.pilot],['Flight No.',d.flightNo||'-'],['Drone',d.drone],['Sensor',d.sensor],['Altitude',d.altitude?d.altitude+' m':'-'],['Cuaca',d.cuaca],['Angin',d.angin?d.angin+' m/s':'-'],['GPS',d.gps?d.gps+' sat':'-'],['Total Set Baterai',d.totalSets+' Set'],['Baterai Awal (Set A)',d.battLevel?d.battLevel+'%':'-'],['Takeoff',d.takeoffTime],['Landing',d.landingTime],['DURASI','__TIMER__'],['Baterai Landing (Set A)',d.lBatt?d.lBatt+'%':'-'],['Tegangan Landing (Set A)',d.lVolt?d.lVolt+' V':'-'],['Kondisi Fisik',d.fisik],['Karakteristik',d.fc],['Hasil Misi',d.hasilMisi]];
   var html='';
   rows.forEach(function(r){if(r[1]==='__TIMER__'){html+='<div class="csi wide"><div class="csl">Durasi Penerbangan</div><div class="csv" style="font-size:22px;font-family:ui-monospace,monospace;letter-spacing:3px;color:var(--yellow)">'+d.durasi+'</div></div>';}else{html+='<div class="csi"><div class="csl">'+r[0]+'</div><div class="csv">'+(r[1]||'-')+'</div></div>';}});
   cs.innerHTML=html;
@@ -911,34 +1115,10 @@ function downloadStoredPdf(){
   setTimeout(function(){URL.revokeObjectURL(url);},4000);
 }
 function resetAll(){
-  if(TI)clearInterval(TI);TI=null;
-  S={step:1,drone:'',sensor:'',comp:'',phys:'',fc:'',oc:'',toTs:null,landTs:null,dur:0,evs:[],hotswaps:[],photoPre:null,photoLand:null};
-  document.querySelectorAll('input:not([type=checkbox]),select,textarea').forEach(function(e){e.value='';});
-  document.querySelectorAll('input[type=checkbox]').forEach(function(e){e.checked=false;});
-  document.querySelectorAll('.cli').forEach(function(e){e.classList.remove('checked','locked');e.onclick=function(){clT(this);};e.querySelector('input')&&(e.querySelector('input').disabled=false);});
-  document.querySelectorAll('.drone-card,.sensor-card').forEach(function(e){e.classList.remove('sel');});
-  document.querySelectorAll('.oct').forEach(function(e){e.classList.remove('ocg','ocr','oco');});
-  document.querySelectorAll('.fcb').forEach(function(e){e.classList.remove('on');});
-  ['comp_y','comp_n','phys_y','phys_n'].forEach(function(id){var el=document.getElementById(id);if(el)el.className='tog';});
-  document.getElementById('sp4').classList.add('hidden');
-  document.getElementById('sp5').classList.add('hidden');
-  document.getElementById('batt2_wrap').classList.add('hidden');
-  document.getElementById('rdy_state').classList.remove('hidden');
-  document.getElementById('fly_state').classList.add('hidden');
-  document.getElementById('pre_land').classList.remove('hidden');
-  document.getElementById('post_land').classList.add('hidden');
-  ['td1','td2','td3'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='00:00:00';});
-  document.getElementById('evlog').innerHTML='<span style="color:var(--muted)">Belum ada kejadian dicatat.</span>';
-  document.getElementById('evsum_wrap').classList.add('hidden');
-  document.getElementById('photo_pre_wrap').classList.add('hidden');
-  document.getElementById('photo_pre_empty').classList.remove('hidden');
-  document.getElementById('photo_land_wrap').classList.add('hidden');
-  document.getElementById('photo_land_empty').classList.remove('hidden');
-  closeCamera();
-  document.getElementById('btn_pdf').style.display='none';
-  cancelHotSwap();
-  LAST_PDF={base64:'',name:''};
-  go(1);
+  // Reload penuh dipakai secara sengaja: cara paling andal untuk memastikan
+  // semua state (termasuk kamera, timer, dan puluhan field baru) benar-benar
+  // bersih tanpa risiko ada elemen lama yang "nyangkut" ke layar berikutnya.
+  location.reload();
 }
 buildDots();updateBar();
 </script>
